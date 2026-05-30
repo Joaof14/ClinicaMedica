@@ -88,3 +88,8 @@ nb-configuration.xml
 ## Miscellaneous
 ##############################
 *.log
+
+
+
+#banco de dados
+src/main/resources/db.properties
