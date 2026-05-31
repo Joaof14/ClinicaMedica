@@ -45,7 +45,7 @@ CREATE TABLE funcionarios (
         ON UPDATE CASCADE ON DELETE CASCADE
 );
 
--- 5. Tabela Medico
+-- 5. Tabela br.com.clinicamedica.Funcionario
 CREATE TABLE medicos (
     id_tb_medico SERIAL PRIMARY KEY,
     id_tb_funcionario INTEGER UNIQUE NOT NULL,
