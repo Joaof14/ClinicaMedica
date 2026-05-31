@@ -1,4 +1,5 @@
 package br.com.clinicamedica;
+
 import java.sql.Connection;
 
 public class TesteConexao {
