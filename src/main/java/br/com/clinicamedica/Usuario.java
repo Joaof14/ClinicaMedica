@@ -143,7 +143,7 @@ public abstract class Usuario {
         try (Connection conn = ConexaoDB.obterConexao();
         PreparedStatement stmt = conn.prepareStatement(sql)){
             stmt.setString(1, login);
-            stmt.setString(1, login);
+            stmt.setString(2, login);
 
             try (ResultSet rs = stmt.executeQuery()){
                 return rs.next();
@@ -297,15 +297,15 @@ public abstract class Usuario {
 
     @Override
     public String toString(){
-        String s = "";
-        s += String.format("Nome: %s120 \n", nome);
-        s += String.format("idade: %3d \n", idade);
-        s += String.format("sexo: %s \n",sexo);
-        s += String.format("cpf: %11s \n", cpf);
-        s += String.format("telefone: %11s \n", telefone);
-        s += String.format("login: %30s \n", login);
-        s += String.format("Usuário ativo: %s \n", (ativo?"sim":"não"));
-
-        return s;
+        return String.format(
+                "Nome: %s%n" +
+                        "Idade: %d%n" +
+                        "Sexo: %s%n" +
+                        "CPF: %s%n" +
+                        "Telefone: %s%n" +
+                        "Login: %s%n" +
+                        "Usuário ativo: %s%n",
+                nome, idade, sexo, cpf, telefone, login, (ativo ? "sim" : "não")
+        );
     }
 }
