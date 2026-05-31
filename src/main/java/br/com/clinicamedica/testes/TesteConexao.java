@@ -1,4 +1,6 @@
-package br.com.clinicamedica;
+package br.com.clinicamedica.testes;
+
+import br.com.clinicamedica.ConexaoDB;
 
 import java.sql.Connection;
 
