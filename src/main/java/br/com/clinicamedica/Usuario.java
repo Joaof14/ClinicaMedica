@@ -1,5 +1,9 @@
 package br.com.clinicamedica;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,17 +61,55 @@ public abstract class Usuario {
 
     /* método estático para autenticar usuário */
     public static boolean autenticar(String login, String senha) {
-        // fazer
-        // busco usuário no banco de dados, se existir, comparo senha, se bater, retorno true, senão retorno false
-        return false;
+        String sql = "SELECT * FROM usuarios WHERE login = ? AND senha = ? AND ativo = true";
+
+        try (Connection conn = ConexaoDB.obterConexao();
+        PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setString(1, login);
+            stmt.setString(1, login);
+
+            try (ResultSet rs = stmt.executeQuery()){
+                return rs.next();
+            }
+        } catch (SQLException e){
+            System.err.println("Erro ao autenticar usuário");
+            return false;
+        }
     }
 
     /* método estático para listar todos os usuários */
     public static List<Usuario> listarUsuarios() {
-        // fazer
-        // acesso ao banco de dados, busco todos os usuários, retorno como lista
-        return new ArrayList<>();
+        List <Usuario> usuarios = new ArrayList<>();
+        String sql = "SELECT * FROM usuarios";
+
+        try (Connection conn = ConexaoDB.obterConexao();
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()){
+                String nome = rs.getString("nome");
+                int idade = rs.getInt("idade");
+                String sexo = rs.getString("sexo");
+                String cpf = rs.getString("cpf");
+                String telefone = rs.getString("telefone");
+                String login = rs.getString("login");
+                String senha = rs.getString("senha");
+                String ativo = rs.getString("ativo");
+            }
+
+            //Ainda precisa de uma classe concreta, pois usuario está como abstrato
+        }
+        catch (SQLException e){
+            System.out.println("Erro ao listar usuários");
+        }
+
+        return usuarios;
     }
+
+
+        
+
+        
 
     public String getNome() {
         return nome;
