@@ -177,7 +177,7 @@ public abstract class Usuario {
             //Ainda precisa de uma classe concreta, pois usuario está como abstrato
         }
         catch (SQLException e){
-            System.out.println("Erro ao listar usuários");
+            System.out.println("Erro ao listar usuários: "+ e.getMessage());
         }
 
         return usuarios;

@@ -1,5 +1,9 @@
 package br.com.clinicamedica;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +19,10 @@ public class Medico extends Funcionario{
     }
 
     public void verMedico(){
-        // implementar
+        System.out.println("Imprimindo Médico:\n");
+        System.out.println("==========================");
+        System.out.println(this.toString());
+        System.out.println("=========================");
     }
 
     // modificar a posteriori o retorno de void para Medico
@@ -35,12 +42,89 @@ public class Medico extends Funcionario{
         // implementar
         List <Medico> medicos = new ArrayList<>();
 
+        // JOIN para trazer dados de usuarios + funcionarios
+        String sql = "SELECT u.nome, u.idade, u.sexo, u.cpf, u.telefone, u.login, u.senha, u.ativo, " +
+                "f.salario, f.carga_horaria_semanal, f.turno, f.atendente, " +
+                "m.area_de_atuacao, m.crm " +
+                "FROM usuarios u " +
+                "JOIN funcionarios f ON f.id_tb_usuario = u.id_tb_usuario " +
+                "JOIN medicos m ON m.id_tb_funcionario = f.id_tb_funcionario";
+
+        try (Connection conn = ConexaoDB.obterConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Medico medico = new Medico(
+                        rs.getString("nome"),
+                        rs.getInt("idade"),
+                        rs.getString("sexo"),
+                        rs.getString("cpf"),
+                        rs.getString("telefone"),
+                        rs.getString("login"),
+                        rs.getString("senha"),
+                        rs.getBoolean("ativo"),
+                        rs.getDouble("salario"),
+                        rs.getInt("carga_horaria_semanal"),
+                        rs.getString("turno"),
+                        rs.getBoolean("atendente"),
+                        rs.getString("area_de_atuacao"),
+                        rs.getString("crm")
+                );
+
+                // Adiciona na lista para depois retornar a lista
+                medicos.add(medico);
+            }
+
+    } catch (SQLException e) {
+            System.out.println("Erro ao listar funcionários: "+e.getMessage());
+        }
+
         return medicos;
     }
 
-    public List<Medico> listarFuncionariosPorArea(){
+    public List<Medico> listarMedicosPorArea(String areaDeAtuacao){
         // implementar
         List <Medico> medicos = new ArrayList<>();
+
+        String sql = "SELECT u.nome, u.idade, u.sexo, u.cpf, u.telefone, u.login, u.senha, u.ativo, " +
+                 "f.salario, f.carga_horaria_semanal, f.turno, f.atendente, " +
+                 "m.area_de_atuacao, m.crm " +
+                 "FROM usuarios u " +
+                 "JOIN funcionarios f ON f.id_tb_usuario = u.id_tb_usuario " +
+                 "JOIN medicos m ON m.id_tb_funcionario = f.id_tb_funcionario " +
+                 "WHERE m.area_de_atuacao = ?";
+
+        try (Connection conn = ConexaoDB.obterConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, areaDeAtuacao);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Medico medico = new Medico(
+                        rs.getString("nome"),
+                        rs.getInt("idade"),
+                        rs.getString("sexo"),
+                        rs.getString("cpf"),
+                        rs.getString("telefone"),
+                        rs.getString("login"),
+                        rs.getString("senha"),
+                        rs.getBoolean("ativo"),
+                        rs.getDouble("salario"),
+                        rs.getInt("carga_horaria_semanal"),
+                        rs.getString("turno"),
+                        rs.getBoolean("atendente"),
+                        rs.getString("area_de_atuacao"),
+                        rs.getString("crm")
+                );
+
+                medicos.add(medico);
+            }
+
+    } catch (SQLException e) {
+            System.out.println("Erro ao listar Médicos: "+e.getMessage());
+        }
 
         return medicos;
     }
@@ -48,9 +132,11 @@ public class Medico extends Funcionario{
     // Adequar para trazer o construtor da classe mãe
     @Override
     public String toString() {
-        return "Medico{" +
-                "areaDeAtuacao='" + areaDeAtuacao + '\'' +
-                ", crm='" + crm + '\'' +
-                '}';
+        return String.format(
+                super.toString() +
+                        "Área de atuação: %s%n" +
+                        "CRM: %d%n" +
+                        areaDeAtuacao, crm
+        );
     }
 }
