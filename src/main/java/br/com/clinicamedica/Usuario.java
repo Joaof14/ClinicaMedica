@@ -74,9 +74,15 @@ public abstract class Usuario {
     }
 
     public void setNome(String nome) {
-        // fazer
-        // todo: validar nome, não pode ser vazio, nem nulo, nem conter números ou caracteres especiais
-        this.nome = nome;
+       try {
+            if (nome == null || nome.isBlank())
+                throw new IllegalArgumentException("Nome nao pode ser nulo ou vazio!");
+            if (!nome.matches("[a-zA-ZÁ-ú]+"))
+                throw new IllegalArgumentException("Nome deve conter apenas letras!");
+            this.nome = nome.trim();
+       } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao setar nome: " + e.getMessage());
+       }
     }
 
     public int getIdade() {
@@ -84,8 +90,13 @@ public abstract class Usuario {
     }
 
     public void setIdade(int idade) {
-        // fazer 
-        this.idade = idade;
+        try {
+            if (idade < 0)
+                throw new IllegalArgumentException("Idade nao pode ser negativa!");
+            this.idade = idade;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao setar idade: " + e.getMessage());
+        }
     }
 
     public String getSexo() {
@@ -93,8 +104,13 @@ public abstract class Usuario {
     }
 
     public void setSexo(String sexo) {
-        // fazer
-        this.sexo = sexo;
+        try {
+            if (sexo == null || sexo.isBlank())
+                throw new IllegalArgumentException("Sexo nao pode ser nulo ou vazio!");
+            this.sexo = sexo;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao setar sexo: " + e.getMessage());
+        }
     }
 
     public String getCpf() {
@@ -102,8 +118,15 @@ public abstract class Usuario {
     }
 
     public void setCpf(String cpf) {
-        // fazer
-        this.cpf = cpf;
+        try {
+            if (cpf == null || cpf.isBlank())
+                throw new IllegalArgumentException("CPF nao pode ser nulo ou vazio!");
+            if (!cpf.matches("\\d{11}"))
+                throw new IllegalArgumentException("CPF deve ter exatamente 11 digitos!");
+            this.cpf = cpf;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao setar CPF: " + e.getMessage());
+        }
     }
 
     public String getTelefone() {
@@ -111,8 +134,15 @@ public abstract class Usuario {
     }
 
     public void setTelefone(String telefone) {
-        // fazer
-        this.telefone = telefone;
+        try {
+            if (telefone == null || telefone.isBlank())
+                throw new IllegalArgumentException("Telefone nao pode ser nulo ou vazio!");
+            if (!telefone.matches("\\d{10,11}"))
+                throw new IllegalArgumentException("Telefone deve conter entre 10 e 11 digitos!");
+            this.telefone = telefone;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao setar telefone: " + e.getMessage());
+        }
     }
 
     public String getLogin() {
@@ -120,8 +150,13 @@ public abstract class Usuario {
     }
 
     public void setLogin(String login) {
-        // fazer
-        this.login = login;
+        try {
+            if (login == null || login.isBlank())
+                throw new IllegalArgumentException("Login nao pode ser nulo ou vazio!");
+            this.login = login;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao setar login: " + e.getMessage());
+        }
     }
 
     public String getSenha() {
@@ -129,8 +164,13 @@ public abstract class Usuario {
     }
 
     public void setSenha(String senha) {
-        // fazer
-        this.senha = senha;
+        try {
+            if (senha == null || senha.isBlank())
+                throw new IllegalArgumentException("Senha nao pode ser nula ou vazia!");
+            this.senha = senha;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao setar senha: " + e.getMessage());
+        }
     }
 
     public boolean isAtivo() {
@@ -138,7 +178,6 @@ public abstract class Usuario {
     }
 
     public void setAtivo(boolean ativo) {
-        // fazer
         this.ativo = ativo;
     }
 
