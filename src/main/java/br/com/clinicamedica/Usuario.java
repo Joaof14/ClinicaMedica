@@ -19,7 +19,8 @@ public abstract class Usuario {
     private boolean ativo;
 
     /* cadastrarUsuario se tornou o construtor Usuario conforme aula 29_05_26 */
-    public Usuario(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha, boolean ativo) {
+    public Usuario(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
+            boolean ativo) {
         setNome(nome);
         setIdade(idade);
         setSexo(sexo);
@@ -30,11 +31,11 @@ public abstract class Usuario {
         setAtivo(ativo);
     }
 
-    /* DIFERENTE DO UML: apenas cadastra usuario no banco*/
-    public void cadastrarUsuario(Usuario usuario){
+    /* DIFERENTE DO UML: apenas cadastra usuario no banco */
+    public void cadastrarUsuario(Usuario usuario) {
         String query = "INSERT INTO usuarios (nome, idade, sexo, cpf, telefone, login, senha, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(query)){
+        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, usuario.getNome());
             stmt.setInt(2, usuario.getIdade());
@@ -63,12 +64,14 @@ public abstract class Usuario {
         System.out.println("=========================");
     }
 
-    /* implementação para atualizar um usuário
-    * Recebe um objeto usuário e os parâmetros a serem atualizados
-    * utiliza set's para validar os valores
-    * atualiza no banco
-    * */
-    public static void atualizarUsuario(Usuario usuario, String nome, int idade, String sexo, String cpf, String telefone, String login, String senha, boolean ativo) {
+    /*
+     * implementação para atualizar um usuário
+     * Recebe um objeto usuário e os parâmetros a serem atualizados
+     * utiliza set's para validar os valores
+     * atualiza no banco
+     */
+    public static void atualizarUsuario(Usuario usuario, String nome, int idade, String sexo, String cpf,
+            String telefone, String login, String senha, boolean ativo) {
         String query = "UPDATE usuarios SET nome = ?, idade = ?, sexo = ?, cpf = ?, telefone = ?, login = ?, senha = ?, ativo = ? WHERE cpf = ?";
 
         String cpfAntigo = usuario.getCpf(); // Como a UML não é um DAO, vamos usar o cpf como atributo identificador
@@ -83,7 +86,7 @@ public abstract class Usuario {
         usuario.setSenha(senha);
         usuario.setAtivo(ativo);
 
-        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(query)){
+        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, usuario.getNome());
             stmt.setInt(2, usuario.getIdade());
@@ -104,12 +107,12 @@ public abstract class Usuario {
                 System.out.println("Aviso: Nenhum usuário encontrado com o CPF informado para atualizar.");
             }
 
-            } catch (Exception error) {
-                System.err.println("Erro ao atualizar no banco: " + error.getMessage());
-            }
+        } catch (Exception error) {
+            System.err.println("Erro ao atualizar no banco: " + error.getMessage());
+        }
     }
 
-    public static void deletarUsuario(Usuario usuario){
+    public static void deletarUsuario(Usuario usuario) {
         // busco usuario no banco de dados, se existir, deleto
 
         if (usuario == null) {
@@ -119,18 +122,20 @@ public abstract class Usuario {
 
         String query = "DELETE FROM usuarios WHERE cpf = ?";
 
-        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(query)){
+        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, usuario.getCpf());
 
             int linhasAfetadas = stmt.executeUpdate();
 
             if (linhasAfetadas > 0) {
-                // Banco implementado com ON DELETE CASCADE o que garante apagar registros atrelados
-                System.out.println("Usuário de CPF: " + usuario.getCpf() + " e todas as suas dependências foram deletados com sucesso!");
+                // Banco implementado com ON DELETE CASCADE o que garante apagar registros
+                // atrelados
+                System.out.println("Usuário de CPF: " + usuario.getCpf()
+                        + " e todas as suas dependências foram deletados com sucesso!");
             } else {
                 System.out.println("Aviso: Nenhum usuário encontrado no banco com este CPF!");
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println("Erro ao tentar deletar o usuário no banco: " + e.getMessage());
         }
 
@@ -141,14 +146,14 @@ public abstract class Usuario {
         String sql = "SELECT * FROM usuarios WHERE login = ? AND senha = ? AND ativo = true";
 
         try (Connection conn = ConexaoDB.obterConexao();
-        PreparedStatement stmt = conn.prepareStatement(sql)){
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, login);
-            stmt.setString(2, login);
+            stmt.setString(2, senha);
 
-            try (ResultSet rs = stmt.executeQuery()){
+            try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next();
             }
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.err.println("Erro ao autenticar usuário");
             return false;
         }
@@ -156,14 +161,14 @@ public abstract class Usuario {
 
     /* Implementação para listar todos os usuários */
     public static List<Usuario> listarUsuarios() {
-        List <Usuario> usuarios = new ArrayList<>();
+        List<Usuario> usuarios = new ArrayList<>();
         String sql = "SELECT * FROM usuarios";
 
         try (Connection conn = ConexaoDB.obterConexao();
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()){
+            while (rs.next()) {
                 String nome = rs.getString("nome");
                 int idade = rs.getInt("idade");
                 String sexo = rs.getString("sexo");
@@ -171,13 +176,12 @@ public abstract class Usuario {
                 String telefone = rs.getString("telefone");
                 String login = rs.getString("login");
                 String senha = rs.getString("senha");
-                String ativo = rs.getString("ativo");
+                boolean ativo = rs.getBoolean("ativo");
             }
 
-            //Ainda precisa de uma classe concreta, pois usuario está como abstrato
-        }
-        catch (SQLException e){
-            System.out.println("Erro ao listar usuários: "+ e.getMessage());
+            // Ainda precisa de uma classe concreta, pois usuario está como abstrato
+        } catch (SQLException e) {
+            System.out.println("Erro ao listar usuários: " + e.getMessage());
         }
 
         return usuarios;
@@ -188,15 +192,15 @@ public abstract class Usuario {
     }
 
     public void setNome(String nome) {
-       try {
+        try {
             if (nome == null || nome.isBlank())
                 throw new IllegalArgumentException("Nome nao pode ser nulo ou vazio!");
-            if (!nome.matches("[a-zA-ZÁ-ú]+"))
-                throw new IllegalArgumentException("Nome deve conter apenas letras!");
+            if (!nome.matches("[a-zA-ZÁ-ú\\s]+"))
+                throw new IllegalArgumentException("Nome deve conter apenas letras e espaços!");
             this.nome = nome.trim();
-       } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println("Erro ao setar nome: " + e.getMessage());
-       }
+        }
     }
 
     public int getIdade() {
@@ -296,7 +300,7 @@ public abstract class Usuario {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return String.format(
                 "Nome: %s%n" +
                         "Idade: %d%n" +
@@ -305,7 +309,6 @@ public abstract class Usuario {
                         "Telefone: %s%n" +
                         "Login: %s%n" +
                         "Usuário ativo: %s%n",
-                nome, idade, sexo, cpf, telefone, login, (ativo ? "sim" : "não")
-        );
+                nome, idade, sexo, cpf, telefone, login, (ativo ? "sim" : "não"));
     }
 }
