@@ -177,6 +177,7 @@ public abstract class Usuario {
                 String login = rs.getString("login");
                 String senha = rs.getString("senha");
                 boolean ativo = rs.getBoolean("ativo");
+
             }
 
             // Ainda precisa de uma classe concreta, pois usuario está como abstrato
