@@ -13,6 +13,12 @@ public class Funcionario extends Usuario {
     private String turno;
     private boolean atendente;
 
+    private static final double SALARIO_MINIMO = 1621.00;
+    private static final double SALARIO_MAXIMO = 5000.00;
+    private static final int CARGA_HORARIA_MINIMA = 20;
+    private static final int CARGA_HORARIA_MAXIMA = 44;
+    private static final Set<String> TURNOS_VALIDOS = Set.of("manhã", "tarde", "noite");
+
     // pode utilizar set's da classe para validações
     public Funcionario(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
             boolean ativo, double salario, int cargaHorariaSemanal, String turno, boolean atendente) {
@@ -23,13 +29,87 @@ public class Funcionario extends Usuario {
         this.atendente = atendente;
     }
 
+    private static void validarSalario(double salario) {
+        if (salario < SALARIO_MINIMO)
+            throw new IllegalArgumentException("O salario nao pode ser inferior ao salario minimo: R$ %.2f.", SALARIO_MINIMO);
+        if (salario > SALARIO_MAXIMO)
+            throw new IllegalArgumentException("O salario nao pode ser superior ao salario maximo: R$ %.2f.", SALARIO_MAXIMO);
+    }
+
+    private static void validarCargaHoraria(int cargaHoraria) {
+        if (cargaHoraria < CARGA_HORARIA_MINIMA)
+            throw new IllegalArgumentException("A carga horaria semanal nao pode ser inferior a %d horas.", CARGA_HORARIA_MINIMA);
+        if (cargaHoraria > CARGA_HORARIA_MAXIMA)
+            throw new IllegalArgumentException("A carga horaria semanal nao pode ser superior a %d horas.", CARGA_HORARIA_MAXIMA);
+    }
+
+    private static void validarTurno(String turno) {
+        if (turno == null || !TURNOS_VALIDOS.contains(turno.toLowerCase()))
+            throw new IllegalArgumentException("Turno invalido. Os turnos validos sao: " + TURNOS_VALIDOS);
+    }
+
+    private static void validarCampos(double salario, int cargaHoraria, String turno) {
+        validarSalario(salario);
+        validarCargaHoraria(cargaHoraria);
+        validarTurno(turno);
+    }
+
     // modificar a posteriori o retorno de void para Funcionario
-    public static void cadastrarFuncionario(String nome, int idade, String sexo, String cpf, String telefone,
+    public static Funcionario cadastrarFuncionario(String nome, int idade, String sexo, String cpf, String telefone,
             String login, String senha, boolean ativo, double salario, int cargaHorariaSemanal, String turno,
             boolean atendente) {
-        // implementar
-        // return new Funcionario( nome, idade, sexo, cpf, telefone, login, senha,
-        // ativo, salario, cargaHorariaSemanal, turno, atendente);
+        Connection conn = null;
+        String sql = "INSERT INTO funcionarios (id_tb_usuario, salario, carga_horaria_semanal, turno, atendente) VALUES (?, ?, ?, ?, ?)";
+        String sqlUsuario = "INSERT INTO usuarios (nome, idade, sexo, cpf, telefone, login, senha, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try {
+            conn = ConexaoDB.obterConexao();
+            conn.setAutoCommit(false);
+            long idUsuario; 
+            try (PreparedStatement stmtUsuario = conn.prepareStatement(sqlUsuario, Statement.RETURN_GENERATED_KEYS)) {
+                s.setString(1, nome);
+                s.setInt(2, idade);
+                s.setString(3,sexo);
+                s.setString(4, cpf);
+                s.setString(5, telefone);
+                s.setString(6, login);
+                s.setString(7, senha);
+                s.setBoolean(8, ativo);
+                s.executeUpdate();
+
+                try (ResultSet k = s.getGeneratedKeys()) {
+                    if (k.next()) 
+                        throw new SQLException("Falha ao obter ID do usuario")
+                    idUsuario = k.getLong(1);
+                }
+            }
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                s.setLong(1, idUsuario);
+                s.setDouble(2, salario);
+                s.setInt(3, cargaHorariaSemanal);
+                s.setString(4, turno);
+                s.setBoolean(5, atendente);
+                s.executeUpdate();
+            }
+            conn.commit();
+            return new Funcionario(nome, idade, sexo, cpf, telefone, login, senha, ativo, salario, cargaHorariaSemanal, turno, atendente);
+        } catch (SQLException e) {
+            if (conn != null) 
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    System.out.println("Erro ao realizar rollback: " + ex.getMessage());
+                    return null;
+                } finally {
+                    if (conn != null)
+                        try {
+                            conn.setAutoCommit(true);
+                            conn.close();
+                        } catch (SQLException ex) {
+                            System.out.println("Erro ao fechar conexao: " + ex.getMessage());
+                        }
+                }
+        }
     }
 
     public void verFuncionario() {
