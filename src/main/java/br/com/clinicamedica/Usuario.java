@@ -1,9 +1,5 @@
 package br.com.clinicamedica;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +14,8 @@ public abstract class Usuario {
     private String senha;
     private boolean ativo;
 
-    /* cadastrarUsuario se tornou o construtor Usuario conforme aula 29_05_26 */
-    public Usuario(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
-            boolean ativo) {
+    /* cadastrarUsuario se tornou o construtor Usuario vide aula 29_05_26 */
+    public Usuario(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha, boolean ativo) {
         setNome(nome);
         setIdade(idade);
         setSexo(sexo);
@@ -31,32 +26,6 @@ public abstract class Usuario {
         setAtivo(ativo);
     }
 
-    /* DIFERENTE DO UML: apenas cadastra usuario no banco */
-    public void cadastrarUsuario(Usuario usuario) {
-        String query = "INSERT INTO usuarios (nome, idade, sexo, cpf, telefone, login, senha, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setString(1, usuario.getNome());
-            stmt.setInt(2, usuario.getIdade());
-            stmt.setString(3, usuario.getSexo());
-            stmt.setString(4, usuario.getCpf());
-            stmt.setString(5, usuario.getTelefone());
-            stmt.setString(6, usuario.getLogin());
-            stmt.setString(7, usuario.getSenha());
-            stmt.setBoolean(8, usuario.isAtivo());
-
-            int linhasAfetadas = stmt.executeUpdate();
-
-            if (linhasAfetadas > 0) {
-                System.out.println("Inserção concluída com sucesso no banco de dados!");
-            }
-
-        } catch (Exception error) {
-            System.err.println("Erro ao atualizar no banco: " + error.getMessage());
-        }
-    }
-
     public void verUsuario() {
         System.out.println("Imprimindo usuário:\n");
         System.out.println("==========================");
@@ -64,19 +33,8 @@ public abstract class Usuario {
         System.out.println("=========================");
     }
 
-    /*
-     * implementação para atualizar um usuário
-     * Recebe um objeto usuário e os parâmetros a serem atualizados
-     * utiliza set's para validar os valores
-     * atualiza no banco
-     */
-    public static void atualizarUsuario(Usuario usuario, String nome, int idade, String sexo, String cpf,
-            String telefone, String login, String senha, boolean ativo) {
-        String query = "UPDATE usuarios SET nome = ?, idade = ?, sexo = ?, cpf = ?, telefone = ?, login = ?, senha = ?, ativo = ? WHERE cpf = ?";
-
-        String cpfAntigo = usuario.getCpf(); // Como a UML não é um DAO, vamos usar o cpf como atributo identificador
-
-        // Uso implementação set's para validação
+    /* método estático para atualizar usuário, uso implementação dos métodos set para validacao*/
+    public static void atualizarUsuario(Usuario usuario, String nome, int idade, String sexo, String cpf, String telefone, String login, String senha, boolean ativo) {
         usuario.setNome(nome);
         usuario.setIdade(idade);
         usuario.setSexo(sexo);
@@ -86,106 +44,29 @@ public abstract class Usuario {
         usuario.setSenha(senha);
         usuario.setAtivo(ativo);
 
-        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(query)) {
-
-            stmt.setString(1, usuario.getNome());
-            stmt.setInt(2, usuario.getIdade());
-            stmt.setString(3, usuario.getSexo());
-            stmt.setString(4, usuario.getCpf());
-            stmt.setString(5, usuario.getTelefone());
-            stmt.setString(6, usuario.getLogin());
-            stmt.setString(7, usuario.getSenha());
-            stmt.setBoolean(8, usuario.isAtivo());
-
-            stmt.setString(9, cpfAntigo);
-
-            int linhasAfetadas = stmt.executeUpdate();
-
-            if (linhasAfetadas > 0) {
-                System.out.println("Atualização concluída com sucesso no banco de dados!");
-            } else {
-                System.out.println("Aviso: Nenhum usuário encontrado com o CPF informado para atualizar.");
-            }
-
-        } catch (Exception error) {
-            System.err.println("Erro ao atualizar no banco: " + error.getMessage());
-        }
+        System.out.println("Atualização concluída!");
     }
 
-    public static void deletarUsuario(Usuario usuario) {
+    /* Como regra de negócio não faz sentido no contexto de um sistema de clínica médica, 
+    pois não existe a possibilidade de deletar um usuário, apenas desativá-lo, perde um registro médico
+    pode se tornar um problema crítico.
+    public static void deletarUsuario(Usuario usuario){
         // busco usuario no banco de dados, se existir, deleto
-
-        if (usuario == null) {
-            System.out.println("Erro: O objeto usuário fornecido é nulo");
-            return;
-        }
-
-        String query = "DELETE FROM usuarios WHERE cpf = ?";
-
-        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, usuario.getCpf());
-
-            int linhasAfetadas = stmt.executeUpdate();
-
-            if (linhasAfetadas > 0) {
-                // Banco implementado com ON DELETE CASCADE o que garante apagar registros
-                // atrelados
-                System.out.println("Usuário de CPF: " + usuario.getCpf()
-                        + " e todas as suas dependências foram deletados com sucesso!");
-            } else {
-                System.out.println("Aviso: Nenhum usuário encontrado no banco com este CPF!");
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao tentar deletar o usuário no banco: " + e.getMessage());
-        }
-
     }
+     */
 
-    /* Implementação para autenticar usuário */
+    /* método estático para autenticar usuário */
     public static boolean autenticar(String login, String senha) {
-        String sql = "SELECT * FROM usuarios WHERE login = ? AND senha = ? AND ativo = true";
-
-        try (Connection conn = ConexaoDB.obterConexao();
-                PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, login);
-            stmt.setString(2, senha);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next();
-            }
-        } catch (SQLException e) {
-            System.err.println("Erro ao autenticar usuário");
-            return false;
-        }
+        // fazer
+        // busco usuário no banco de dados, se existir, comparo senha, se bater, retorno true, senão retorno false
+        return false;
     }
 
-    /* Implementação para listar todos os usuários */
+    /* método estático para listar todos os usuários */
     public static List<Usuario> listarUsuarios() {
-        List<Usuario> usuarios = new ArrayList<>();
-        String sql = "SELECT * FROM usuarios";
-
-        try (Connection conn = ConexaoDB.obterConexao();
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                String nome = rs.getString("nome");
-                int idade = rs.getInt("idade");
-                String sexo = rs.getString("sexo");
-                String cpf = rs.getString("cpf");
-                String telefone = rs.getString("telefone");
-                String login = rs.getString("login");
-                String senha = rs.getString("senha");
-                boolean ativo = rs.getBoolean("ativo");
-
-            }
-
-            // Ainda precisa de uma classe concreta, pois usuario está como abstrato
-        } catch (SQLException e) {
-            System.out.println("Erro ao listar usuários: " + e.getMessage());
-        }
-
-        return usuarios;
+        // fazer
+        // acesso ao banco de dados, busco todos os usuários, retorno como lista
+        return new ArrayList<>();
     }
 
     public String getNome() {
@@ -193,15 +74,15 @@ public abstract class Usuario {
     }
 
     public void setNome(String nome) {
-        try {
+       try {
             if (nome == null || nome.isBlank())
                 throw new IllegalArgumentException("Nome nao pode ser nulo ou vazio!");
-            if (!nome.matches("[a-zA-ZÁ-ú\\s]+"))
-                throw new IllegalArgumentException("Nome deve conter apenas letras e espaços!");
+            if (!nome.matches("[a-zA-ZÁ-ú]+"))
+                throw new IllegalArgumentException("Nome deve conter apenas letras!");
             this.nome = nome.trim();
-        } catch (IllegalArgumentException e) {
+       } catch (IllegalArgumentException e) {
             System.out.println("Erro ao setar nome: " + e.getMessage());
-        }
+       }
     }
 
     public int getIdade() {
@@ -301,15 +182,16 @@ public abstract class Usuario {
     }
 
     @Override
-    public String toString() {
-        return String.format(
-                "Nome: %s%n" +
-                        "Idade: %d%n" +
-                        "Sexo: %s%n" +
-                        "CPF: %s%n" +
-                        "Telefone: %s%n" +
-                        "Login: %s%n" +
-                        "Usuário ativo: %s%n",
-                nome, idade, sexo, cpf, telefone, login, (ativo ? "sim" : "não"));
+    public String toString(){
+        String s = "";
+        s += String.format("Nome: %s120 \n", nome);
+        s += String.format("idade: %3d \n", idade);
+        s += String.format("sexo: %s \n",sexo);
+        s += String.format("cpf: %11s \n", cpf);
+        s += String.format("telefone: %11s \n", telefone);
+        s += String.format("login: %30s \n", login);
+        s += String.format("Usuário ativo: %s \n", (ativo?"sim":"não"));
+
+        return s;
     }
 }
