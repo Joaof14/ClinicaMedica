@@ -12,8 +12,9 @@ public class TesteConsulta {
 
         //testar gerar consulta
         System.out.println("Gerando consulta");
-        Consulta.gerarConsulta( LocalDate.of(2026, 6, 10), LocalTime.of(9, 0), "00000000000",  "CRM12345");
-
+        Consulta.gerarConsulta( LocalDate.of(2026, 6, 10), LocalTime.of(9, 0), "11111111111",  "CRM12345");
+        Consulta.gerarConsulta( LocalDate.of(2026, 6, 10), LocalTime.of(9, 0), "11111111111",  "CRM-RN-1111");
+        
         // listarConsultas
         System.out.println("Teste de listagem de consultas:");
         List<Consulta> lista = Consulta.listarConsultas();

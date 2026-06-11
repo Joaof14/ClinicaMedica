@@ -34,65 +34,128 @@ public class Consulta {
         this.crmMedico = crmMedico;
     }
 
-    public void verConsulta(){
+    public void verConsulta() {
         System.out.println("Imprimindo Consulta:\n");
         System.out.println("==========================");
         System.out.println(this.toString());
         System.out.println("=========================");
     }
 
-    public static void gerarConsulta(LocalDate data, LocalTime horario,String cpfPaciente, String crmMedico){
-        //verifica argumentos validos.
-        if (data == null){ throw new IllegalArgumentException("Data não pode ser nula");}
-        if (horario == null){ throw new IllegalArgumentException("Horário não pode ser nulo");}
-        if (cpfPaciente == null || cpfPaciente.isBlank()){ throw new IllegalArgumentException("cpf do paciente não pode ser nulo nem branco");}
-        if (crmMedico == null || crmMedico.isBlank()){ throw new IllegalArgumentException("crm do medico nao pode ser nulo nem branco");}
+    public static void gerarConsulta(LocalDate data, LocalTime horario, String cpfPaciente, String crmMedico) {
+        if (data == null) throw new IllegalArgumentException("Data não pode ser nula");
+        if (horario == null) throw new IllegalArgumentException("Horário não pode ser nulo");
+        if (cpfPaciente == null || cpfPaciente.isBlank()) throw new IllegalArgumentException("CPF do paciente não pode ser nulo nem branco");
+        if (crmMedico == null || crmMedico.isBlank()) throw new IllegalArgumentException("CRM do médico não pode ser nulo nem branco");
 
+        String sqlPaciente = """
+            SELECT p.id_tb_paciente
+            FROM pacientes p
+            JOIN usuarios u ON p.id_tb_usuario = u.id_tb_usuario
+            WHERE u.cpf = ?
+            """;
 
-        String sql = """
-                INSERT INTO consultas (data, horario, status, prescricao, cpf_paciente, crm_medico)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """;
+        String sqlMedico = """
+            SELECT m.id_tb_medico
+            FROM medicos m
+            WHERE m.crm = ?
+            """;
 
-        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(sql);){
+        String sqlInsert = """
+            INSERT INTO consultas (id_consulta, id_tb_paciente, id_tb_medico, data_consulta, horario_consulta, status)
+            VALUES (?, ?, ?, ?, ?, ?::status_consulta)
+            """;
 
-            stmt.setDate(1, Date.valueOf(data));
-            stmt.setTime(2, Time.valueOf(horario));
-            stmt.setString(3, StatusConsulta.AGENDADA.name());
-            stmt.setString(4, null);
-            stmt.setString(5, crmMedico);
-            stmt.setString(6, cpfPaciente);
+        try (Connection conn = ConexaoDB.obterConexao()) {
+            Integer idPaciente = null;
+            Integer idMedico = null;
 
-            int linhasAfetadas = stmt.executeUpdate();
-            if (linhasAfetadas > 0)
-                System.out.println("Consulta gerada com sucesso!");
-        
-        } catch (Exception e){
+            try (PreparedStatement stmtPaciente = conn.prepareStatement(sqlPaciente)) {
+                stmtPaciente.setString(1, cpfPaciente);
+                try (ResultSet rs = stmtPaciente.executeQuery()) {
+                    if (rs.next()) {
+                        idPaciente = rs.getInt("id_tb_paciente");
+                    }
+                }
+            }
+
+            if (idPaciente == null) {
+                System.out.println("Paciente não encontrado para o CPF: " + cpfPaciente);
+                return;
+            }
+
+            try (PreparedStatement stmtMedico = conn.prepareStatement(sqlMedico)) {
+                stmtMedico.setString(1, crmMedico);
+                try (ResultSet rs = stmtMedico.executeQuery()) {
+                    if (rs.next()) {
+                        idMedico = rs.getInt("id_tb_medico");
+                    }
+                }
+            }
+
+            if (idMedico == null) {
+                System.out.println("Médico não encontrado para o CRM: " + crmMedico);
+                return;
+            }
+
+            String idConsulta = "CONS-" + System.currentTimeMillis();
+
+            try (PreparedStatement stmtInsert = conn.prepareStatement(sqlInsert)) {
+                stmtInsert.setString(1, idConsulta);
+                stmtInsert.setInt(2, idPaciente);
+                stmtInsert.setInt(3, idMedico);
+                stmtInsert.setDate(4, Date.valueOf(data));
+                stmtInsert.setTime(5, Time.valueOf(horario));
+                stmtInsert.setString(6, "AGENDADA");
+
+                int linhasAfetadas = stmtInsert.executeUpdate();
+                if (linhasAfetadas > 0) {
+                    System.out.println("Consulta gerada com sucesso! ID: " + idConsulta);
+                }
+            }
+
+        } catch (Exception e) {
             System.err.println("Erro ao gerar consultas: " + e.getMessage());
         }
     }
 
-
-    public static List<Consulta> listarConsultas(){
-        //To do.
+    public static List<Consulta> listarConsultas() {
         List<Consulta> consultas = new ArrayList<>();
 
-        String sql = "SELECT * FROM consultas";
+        // Faz JOIN para recuperar CPF e CRM, que são os dados usados no objeto Java
+        String sql = """
+                SELECT c.id_tb_consulta, c.data_consulta, c.horario_consulta,
+                       c.status, c.prescricao,
+                       u.cpf AS cpf_paciente,
+                       m.crm AS crm_medico
+                FROM consultas c
+                JOIN pacientes p  ON c.id_tb_paciente = p.id_tb_paciente
+                JOIN usuarios u   ON p.id_tb_usuario  = u.id_tb_usuario
+                JOIN medicos m    ON c.id_tb_medico    = m.id_tb_medico
+                """;
 
-        try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()){
-            
-            while (rs.next()){
-                Consulta consulta = new Consulta(rs.getInt("id"),rs.getDate("data").toLocalDate(),rs.getTime("horario").toLocalTime(), StatusConsulta.valueOf(rs.getString("status")), rs.getString("prescricao"), rs.getString("cpf_paciente"),rs.getString("crm_medico") );
+        try (Connection conn = ConexaoDB.obterConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Consulta consulta = new Consulta(
+                        rs.getInt("id_tb_consulta"),
+                        rs.getDate("data_consulta").toLocalDate(),
+                        rs.getTime("horario_consulta").toLocalTime(),
+                        StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                        rs.getString("prescricao"),
+                        rs.getString("cpf_paciente"),
+                        rs.getString("crm_medico")
+                );
                 consultas.add(consulta);
             }
 
-        } catch (Exception e){
+        } catch (Exception e) {
             System.err.println("Erro ao listar consultas: " + e.getMessage());
         }
 
         return consultas;
     }
-
     public int getId() {
         return id;
     }
