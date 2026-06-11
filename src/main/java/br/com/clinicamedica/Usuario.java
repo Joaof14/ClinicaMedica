@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.clinicamedica.Paciente;
+import br.com.clinicamedica.Funcionario;
+
 public abstract class Usuario {
 
     private String nome;
@@ -161,31 +164,15 @@ public abstract class Usuario {
 
     /* Implementação para listar todos os usuários */
     public static List<Usuario> listarUsuarios() {
-        List<Usuario> usuarios = new ArrayList<>();
-        String sql = "SELECT * FROM usuarios";
+        List<Usuario> todosUsuarios = new ArrayList<>();
+        // TODO: implementar listarPaciente e descomentar
+        // List<Paciente> pacientes = Paciente.listarPaciente();
+        List<Funcionario> funcionarios = Funcionario.listarFuncionario();
 
-        try (Connection conn = ConexaoDB.obterConexao();
-                PreparedStatement stmt = conn.prepareStatement(sql);
-                ResultSet rs = stmt.executeQuery()) {
+        // todosUsuarios.addAll(funcionarios);
+        todosUsuarios.addAll(funcionarios);
 
-            while (rs.next()) {
-                String nome = rs.getString("nome");
-                int idade = rs.getInt("idade");
-                String sexo = rs.getString("sexo");
-                String cpf = rs.getString("cpf");
-                String telefone = rs.getString("telefone");
-                String login = rs.getString("login");
-                String senha = rs.getString("senha");
-                boolean ativo = rs.getBoolean("ativo");
-
-            }
-
-            // Ainda precisa de uma classe concreta, pois usuario está como abstrato
-        } catch (SQLException e) {
-            System.out.println("Erro ao listar usuários: " + e.getMessage());
-        }
-
-        return usuarios;
+        return todosUsuarios;
     }
 
     public String getNome() {
