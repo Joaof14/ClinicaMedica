@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.sql.Statement;
 
 public class Funcionario extends Usuario {
     private double salario;
@@ -199,8 +199,8 @@ public class Funcionario extends Usuario {
                 System.out.println("Erro ao deletar funcionario: " + e.getMessage());
                 return false;
         }
-        }
     }
+    
 
     public static List<Funcionario> listarFuncionario() {
         // implementar

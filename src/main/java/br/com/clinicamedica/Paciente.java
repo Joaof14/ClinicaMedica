@@ -76,7 +76,7 @@ public class Paciente extends Usuario{
 
             conn.commit();
 
-            Paciente paciente = new Paciente(nome, idade, sexo, cpf, telefone, login, senha, ativo, peso, altura, sintomas);
+            Paciente paciente = new Paciente(altura, peso, sintomas, nome, idade, sexo, cpf, telefone, login, senha, ativo );
             System.out.println("Paciente cadastrado com sucesso! CPF: " + cpf);
             return paciente;
 
@@ -237,6 +237,9 @@ public class Paciente extends Usuario{
 
             while (rs.next()) {
                 Paciente paciente = new Paciente(
+                    rs.getFloat("altura"),
+                    rs.getFloat("peso"),
+                    rs.getString("sintomas"),
                     rs.getString("nome"),
                     rs.getInt("idade"),
                     rs.getString("sexo"),
@@ -244,10 +247,8 @@ public class Paciente extends Usuario{
                     rs.getString("telefone"),
                     rs.getString("login"),
                     rs.getString("senha"),
-                    rs.getBoolean("ativo"),
-                    rs.getFloat("peso"),
-                    rs.getFloat("altura"),
-                    rs.getString("sintomas")
+                    rs.getBoolean("ativo")
+                    
                 );
                 pacientes.add(paciente);
             }
@@ -276,6 +277,9 @@ public class Paciente extends Usuario{
 
             while (rs.next()) {
                 Paciente paciente = new Paciente(
+                    rs.getFloat("altura"),
+                    rs.getFloat("peso"),
+                    rs.getString("sintomas"),
                     rs.getString("nome"),
                     rs.getInt("idade"),
                     rs.getString("sexo"),
@@ -283,10 +287,7 @@ public class Paciente extends Usuario{
                     rs.getString("telefone"),
                     rs.getString("login"),
                     rs.getString("senha"),
-                    rs.getBoolean("ativo"),
-                    rs.getFloat("peso"),
-                    rs.getFloat("altura"),
-                    rs.getString("sintomas")
+                    rs.getBoolean("ativo")
                 );
                 pacientes.add(paciente);
             }
