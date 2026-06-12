@@ -14,15 +14,15 @@ public class Paciente extends Usuario{
     
     private static List<Paciente> pacientes = new ArrayList<>();
 
-
-    public Paciente(float altura, float peso, String sintomas, String nome, int idade, String sexo, String cpf, String telefone, String login, String senha, boolean ativo) {
+    
+    public Paciente(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
+            boolean ativo, float peso, float altura, String sintomas) {
         super(nome, idade, sexo, cpf, telefone, login, senha, ativo);
-        this.altura = altura;
         this.peso = peso;
+        this.altura = altura;
         this.sintomas = sintomas;
     }
 
-    
     public void verPaciente(){
         System.out.println("Imprimindo Paciente:\n");
         System.out.println("==========================");
@@ -30,7 +30,8 @@ public class Paciente extends Usuario{
         System.out.println("=========================");
     }
 
-    public static Paciente cadastrarPaciente(float altura, float peso, String sintomas, String nome, int idade, String sexo, String cpf, String telefone, String login, String senha, boolean ativo) {
+    public static Paciente cadastrarPaciente(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
+            boolean ativo, float peso, float altura, String sintomas) {
                 Connection conn = null;
         try {
             conn = ConexaoDB.obterConexao();
@@ -76,7 +77,7 @@ public class Paciente extends Usuario{
 
             conn.commit();
 
-            Paciente paciente = new Paciente(altura, peso, sintomas, nome, idade, sexo, cpf, telefone, login, senha, ativo );
+            Paciente paciente = new Paciente(nome, idade, sexo, cpf, telefone, login, senha, ativo, altura, peso, sintomas);
             System.out.println("Paciente cadastrado com sucesso! CPF: " + cpf);
             return paciente;
 
@@ -102,7 +103,7 @@ public class Paciente extends Usuario{
         }
     }
 
-    public void atualizarPaciente(Paciente paciente, float altura, float peso, String sintomas, String nome, int idade, String sexo, String cpf, String telefone, String login, String senha, boolean ativo){
+    public void atualizarPaciente(Paciente paciente, String nome, int idade, String sexo, String cpf, String telefone, String login, String senha, boolean ativo, float altura, float peso, String sintomas){
                 String sqlUsuario = "UPDATE usuarios SET nome = ?, idade = ?, sexo = ?, cpf = ?, " +
                            "telefone = ?, login = ?, senha = ?, ativo = ? WHERE cpf = ?";
         
@@ -237,9 +238,6 @@ public class Paciente extends Usuario{
 
             while (rs.next()) {
                 Paciente paciente = new Paciente(
-                    rs.getFloat("altura"),
-                    rs.getFloat("peso"),
-                    rs.getString("sintomas"),
                     rs.getString("nome"),
                     rs.getInt("idade"),
                     rs.getString("sexo"),
@@ -247,8 +245,10 @@ public class Paciente extends Usuario{
                     rs.getString("telefone"),
                     rs.getString("login"),
                     rs.getString("senha"),
-                    rs.getBoolean("ativo")
-                    
+                    rs.getBoolean("ativo"),
+                    rs.getFloat("altura"),
+                    rs.getFloat("peso"),
+                    rs.getString("sintomas")  
                 );
                 pacientes.add(paciente);
             }
@@ -277,9 +277,6 @@ public class Paciente extends Usuario{
 
             while (rs.next()) {
                 Paciente paciente = new Paciente(
-                    rs.getFloat("altura"),
-                    rs.getFloat("peso"),
-                    rs.getString("sintomas"),
                     rs.getString("nome"),
                     rs.getInt("idade"),
                     rs.getString("sexo"),
@@ -287,7 +284,10 @@ public class Paciente extends Usuario{
                     rs.getString("telefone"),
                     rs.getString("login"),
                     rs.getString("senha"),
-                    rs.getBoolean("ativo")
+                    rs.getBoolean("ativo"),
+                    rs.getFloat("altura"),
+                    rs.getFloat("peso"),
+                    rs.getString("sintomas")
                 );
                 pacientes.add(paciente);
             }

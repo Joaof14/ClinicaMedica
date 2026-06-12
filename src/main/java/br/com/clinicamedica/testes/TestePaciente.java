@@ -1,5 +1,7 @@
 package br.com.clinicamedica.testes;
 
+import java.util.List;
+
 import br.com.clinicamedica.Paciente;
 
 public class TestePaciente {
@@ -8,8 +10,9 @@ public class TestePaciente {
         // Teste de cadastro
         System.out.println("=== TESTE CADASTRO ===");
         Paciente novoPaciente = Paciente.cadastrarPaciente(
-            1.7F, 50F, "Dor de cabeça frequente", "Maria Santos", 20, 
-            "feminino", "12345678901", "84999990000", "maria.santos", "senha456", true
+            "Maria Santos", 30, "Feminino", "12345678901", 
+            "84999990000", "maria.santos", "senha456", true,
+            60.5f, 1.62f, "Dor de cabeça frequente"
         );
         
         if (novoPaciente != null) {
@@ -18,10 +21,14 @@ public class TestePaciente {
         
         // Teste de listagem
         
+        
+        // Teste de busca por CPF
+        
+        
         // Teste de atualização
         
-        // Teste de listagem por sintomas
         
+        // Teste de listagem por sintomas
         
     }
 }
