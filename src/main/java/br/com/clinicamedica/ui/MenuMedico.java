@@ -2,7 +2,16 @@ package br.com.clinicamedica.ui;
 
 public class MenuMedico {
     public static void exibir(){
+
+        int opcao;
+        do{
+
+            opcao = Utils.lerInteiro();
+            //Implementar switch case
+
+        }while (opcao != 0);
         
+        Utils.limparTela();
         System.out.println("|--------------------------------------------------|");
         System.out.println("|               GERENCIAR MÉDICOS                  |");
         System.out.println("|--------------------------------------------------|");

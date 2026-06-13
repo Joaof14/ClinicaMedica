@@ -1,12 +1,7 @@
 package br.com.clinicamedica.ui;
 
-import java.util.Scanner;
 
 public class MenuPrincipal {
-
-    private static final Scanner entrada = new Scanner(System.in);
-
-
     public static void main(String[] args) {
         
         
@@ -19,8 +14,8 @@ public class MenuPrincipal {
         if (autenticado) {
             menuGeral();
         }
+        Utils.fecharScanner();
         System.out.println("\nSistema encerrado. Até logo!");
-        entrada.close();
     }
 
     // LOGIN
@@ -28,11 +23,9 @@ public class MenuPrincipal {
         int tentativas = 3;
         while (tentativas > 0) {
             System.out.println(" LOGIN ");
-            System.out.print("Login   : ");
-            String login = entrada.nextLine().trim();
-            System.out.print("Senha   : ");
-            String senha = entrada.nextLine().trim();
             System.out.println("");
+            String login = Utils.lerTexto("Login   : ");
+            String senha = Utils.lerTexto("Senha   : ");
 
             // TODO: Usuario.autenticar(login, senha)
             
@@ -45,7 +38,7 @@ public class MenuPrincipal {
     public static void menuGeral() {
         int opcao;
         do {
-            
+
             System.out.println("|--------------------------------------------------|");
             System.out.println("|              MENU PRINCIPAL                      |");
             System.out.println("|--------------------------------------------------|");
@@ -57,7 +50,7 @@ public class MenuPrincipal {
             System.out.println("|  0 · Sair                                        |");
             System.out.println("|--------------------------------------------------|");
             System.out.print("  Escolha uma opção: ");
-            opcao = entrada.nextInt(); //implementar uma leitura especifica para capturar erros
+            opcao = Utils.lerInteiro(); 
             
             switch (opcao) { 
                 case 1 -> MenuUsuario.exibir();

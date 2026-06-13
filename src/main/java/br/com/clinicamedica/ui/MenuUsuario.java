@@ -2,6 +2,14 @@ package br.com.clinicamedica.ui;
 
 public class MenuUsuario {
     public static void exibir(){
+
+        int opcao;
+        do{
+
+            opcao = Utils.lerInteiro();
+            //Implementar switch case
+
+        }while (opcao != 0);
         
         System.out.println("|--------------------------------------------------|");
         System.out.println("|              GERENCIAR USUÁRIOS                  |");
