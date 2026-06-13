@@ -4,6 +4,7 @@ public class MenuPaciente {
     public static void exibir() {
         int opcao;
         do{
+            Utils.limparTela();
             System.out.println("|--------------------------------------------------|");
             System.out.println("|              GERENCIAR PACIENTES                 |");
             System.out.println("|--------------------------------------------------|");
@@ -15,8 +16,7 @@ public class MenuPaciente {
             System.out.println("|  6 · Deletar paciente                            |");
             System.out.println("|  0 · Voltar                                      |");
             System.out.println("|--------------------------------------------------|");
-            System.out.print("  Escolha uma opção: ");
-            opcao = Utils.lerInteiro();
+            opcao = Utils.lerInteiro("Escolha uma opção: ");
             //Implementar switch case
 
         }while (opcao != 0);

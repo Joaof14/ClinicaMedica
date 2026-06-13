@@ -6,7 +6,9 @@ public class Utils {
     public static Scanner entrada = new Scanner(System.in);
     // utilitarios 
 
-
+    public static void limparTela(){
+        System.out.print("\n\n\n\n\n");
+    }
 
     public static void pausar() {
         System.out.print("\nPressione ENTER para continuar...");

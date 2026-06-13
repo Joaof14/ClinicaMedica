@@ -4,6 +4,7 @@ public class MenuFuncionario {
     public static void exibir(){
         int opcao;
         do{
+            Utils.limparTela();
             System.out.println("|--------------------------------------------------|");
             System.out.println("|           GERENCIAR FUNCIONÁRIOS                 |");
             System.out.println("|--------------------------------------------------|");
@@ -15,10 +16,13 @@ public class MenuFuncionario {
             System.out.println("|  6 · Deletar funcionário                         |");
             System.out.println("|  0 · Voltar                                      |");
             System.out.println("|--------------------------------------------------|");
-            opcao = Utils.lerInteiro();
+            opcao = Utils.lerInteiro("");
             //Implementar switch case
 
         }while (opcao != 0);
         
     }
+
+
+
 }

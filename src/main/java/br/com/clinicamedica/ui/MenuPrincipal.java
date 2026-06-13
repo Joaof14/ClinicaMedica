@@ -38,6 +38,7 @@ public class MenuPrincipal {
     public static void menuGeral() {
         int opcao;
         do {
+            Utils.limparTela();
             System.out.println("|--------------------------------------------------|");
             System.out.println("|              MENU PRINCIPAL                      |");
             System.out.println("|--------------------------------------------------|");
@@ -56,7 +57,7 @@ public class MenuPrincipal {
                 case 3 -> MenuMedico.exibir();
                 case 4 -> MenuConsulta.exibir();
                 case 0 -> { }
-                default -> System.out.println("Opção inválida.");
+                default -> Utils.msgOpcaoInvalida();
             }
         } while (opcao != 0);
         

@@ -5,7 +5,7 @@ public class MenuConsulta {
         int opcao;
         do{
 
-            
+            Utils.limparTela();
             System.out.println("| -------------------------------------------------|");
             System.out.println("|              GERENCIAR CONSULTAS                 |");
             System.out.println("|--------------------------------------------------|");
@@ -22,9 +22,9 @@ public class MenuConsulta {
             System.out.println("| 10 · Cancelar consulta                           |");
             System.out.println("|  0 · Voltar                                      |");
             System.out.println("|--------------------------------------------------|");
-            System.out.print("  Escolha uma opção: ");
+            
 
-            opcao = Utils.lerInteiro();
+            opcao = Utils.lerInteiro("Escolha uma opção: ");
             //Implementar switch case
 
         }while (opcao != 0);
