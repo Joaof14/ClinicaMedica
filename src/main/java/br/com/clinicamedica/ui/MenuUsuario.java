@@ -1,26 +1,48 @@
 package br.com.clinicamedica.ui;
 
 public class MenuUsuario {
-    public static void exibir(){
 
-        int opcao;
-        do{
-
-            opcao = Utils.lerInteiro();
-            //Implementar switch case
-
-        }while (opcao != 0);
-        
-        System.out.println("|--------------------------------------------------|");
-        System.out.println("|              GERENCIAR USUÁRIOS                  |");
-        System.out.println("|--------------------------------------------------|");
-        System.out.println("|  1 · Cadastrar usuário                           |");
-        System.out.println("|  2 · Ver usuário (por CPF)                       |");
-        System.out.println("|  3 · Listar todos os usuários                    |");
-        System.out.println("|  4 · Atualizar usuário                           |");
-        System.out.println("|  5 · Deletar / Desativar usuário                 |");
-        System.out.println("|  0 · Voltar                                      |");
-        System.out.println("|--------------------------------------------------|");
-        System.out.print("  Escolha uma opção: ");
+    public static String lerNome() {
+        return Utils.lerTexto("Nome: ");
     }
+
+    public static int lerIdade() {
+        return Utils.lerInteiro("Idade: ");
+    }
+
+    public static String lerSexo() {
+        return Utils.lerTexto("Sexo: ");
+    }
+
+    public static String lerCpf() {
+        return Utils.lerTexto("CPF: ");
+    }
+
+    public static String lerTelefone() {
+        return Utils.lerTexto("Telefone: ");
+    }
+
+    public static String lerLogin() {
+        return Utils.lerTexto("Login: ");
+    }
+
+    public static String lerSenha() {
+        return Utils.lerTexto("Senha: ");
+    }
+
+    public static boolean lerAtivo() {
+        return Utils.lerBoolean("Ativo? (true/false): ");
+    }
+
+    public static void exibirDadosBasicos(Usuario usuario) {
+        System.out.println("Nome: " + usuario.getNome());
+        System.out.println("Idade: " + usuario.getIdade());
+        System.out.println("Sexo: " + usuario.getSexo());
+        System.out.println("CPF: " + usuario.getCpf());
+        System.out.println("Telefone: " + usuario.getTelefone());
+        System.out.println("Login: " + usuario.getLogin());
+        System.out.println("Ativo: " + usuario.isAtivo());
+    }
+}
+    
 }

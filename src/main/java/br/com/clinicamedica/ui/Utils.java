@@ -6,12 +6,15 @@ public class Utils {
     public static Scanner entrada = new Scanner(System.in);
     // utilitarios 
 
+
+
     public static void pausar() {
         System.out.print("\nPressione ENTER para continuar...");
         entrada.nextLine();
     }
 
-    public static int lerInteiro() {
+    public static int lerInteiro(String prompt) {
+        System.out.print(prompt);
         try {
             String linha = entrada.nextLine().trim();
             return Integer.parseInt(linha);
@@ -30,7 +33,15 @@ public class Utils {
         pausar();
     }
 
-   
+    public static void msgSucesso(String msg) {
+        System.out.println("Operação realizada com Sucesso!" + msg);
+        pausar();
+    }
+
+    public static void msgErro(String msg) {
+        System.out.println("Erro na operação!" + msg);
+        pausar();
+    }
 
     public static void fecharScanner() {
         entrada.close();
