@@ -77,7 +77,7 @@ public class Paciente extends Usuario{
 
             conn.commit();
 
-            Paciente paciente = new Paciente(nome, idade, sexo, cpf, telefone, login, senha, ativo, altura, peso, sintomas);
+            Paciente paciente = new Paciente(nome, idade, sexo, cpf, telefone, login, senha, ativo, peso, altura,  sintomas);
             System.out.println("Paciente cadastrado com sucesso! CPF: " + cpf);
             return paciente;
 
@@ -246,8 +246,8 @@ public class Paciente extends Usuario{
                     rs.getString("login"),
                     rs.getString("senha"),
                     rs.getBoolean("ativo"),
-                    rs.getFloat("altura"),
                     rs.getFloat("peso"),
+                    rs.getFloat("altura"),
                     rs.getString("sintomas")  
                 );
                 pacientes.add(paciente);
@@ -285,8 +285,8 @@ public class Paciente extends Usuario{
                     rs.getString("login"),
                     rs.getString("senha"),
                     rs.getBoolean("ativo"),
-                    rs.getFloat("altura"),
                     rs.getFloat("peso"),
+                    rs.getFloat("altura"),
                     rs.getString("sintomas")
                 );
                 pacientes.add(paciente);
