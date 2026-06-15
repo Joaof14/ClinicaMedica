@@ -1,8 +1,13 @@
 package br.com.clinicamedica.ui;
 
+import br.com.clinicamedica.Medico;
+import br.com.clinicamedica.Paciente;
+
 public class MenuMedico {
 
-    public static void exibir() {
+    
+
+    public static void exibir(Medico medicoLogado) {
         int opcao;
 
         do {
@@ -33,32 +38,45 @@ public class MenuMedico {
     }
 
     private static void verConsultas() {
-        System.out.println("Função: verConsultas");
+        Utils.limparTela();
+        System.out.println("Função: verConsultas do medico");
         // TODO
+        Utils.pausar();
     }
 
     private static void iniciarConsulta() {
+        Utils.limparTela();
         System.out.println("Função: iniciarConsulta");
         // TODO
+        Utils.pausar();
     }
 
     private static void concluirConsulta() {
+        Utils.limparTela();
         System.out.println("Função: concluirConsulta");
         // TODO
+        Utils.pausar();
     }
 
     private static void registrarDiagnostico() {
+        Utils.limparTela();
         System.out.println("Função: registrarDiagnostico");
         // TODO
+        Utils.pausar();
     }
 
     private static void registrarPrescricao() {
+        Utils.limparTela();
         System.out.println("Função: registrarPrescricao");
         // TODO
+        Utils.pausar();
+        
     }
 
     private static void atualizarStatusConsulta() {
+        Utils.limparTela();
         System.out.println("Função: atualizarStatusConsulta");
         // TODO
+        Utils.pausar();
     }
 }

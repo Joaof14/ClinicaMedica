@@ -6,6 +6,12 @@ public class Utils {
 
     private static final Scanner entrada = new Scanner(System.in);
 
+    public static void limparTela() {
+    for (int i = 0; i < 15; i++) {
+        System.out.println();
+    }
+}
+
     public static String lerTexto(String mensagem) {
         System.out.print(mensagem);
         return entrada.nextLine();

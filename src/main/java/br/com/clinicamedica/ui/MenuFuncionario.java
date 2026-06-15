@@ -1,8 +1,10 @@
 package br.com.clinicamedica.ui;
 
+import br.com.clinicamedica.Funcionario;
+
 public class MenuFuncionario {
 
-    public static void exibir() {
+    public static void exibir(Funcionario funcionarioLogado) {
         int opcao;
 
         do {
@@ -47,67 +49,93 @@ public class MenuFuncionario {
     }
 
     private static void cadastrarPaciente() {
+        Utils.limparTela();
         System.out.println("Função: cadastrarPaciente");
         // TODO
+        Utils.pausar();
     }
 
     private static void atualizarPaciente() {
+        Utils.limparTela();
         System.out.println("Função: atualizarPaciente");
         // TODO
+        Utils.pausar();
     }
 
     private static void removerPaciente() {
+        Utils.limparTela();
         System.out.println("Função: removerPaciente");
         // TODO
+        Utils.pausar();
     }
 
     private static void listarPacientes() {
+        Utils.limparTela();
         System.out.println("Função: listarPacientes");
         // TODO
+        Utils.pausar();
     }
 
     private static void listarPacientesPorSintomas() {
+        Utils.limparTela();
         System.out.println("Função: listarPacientesPorSintomas");
         // TODO
+        Utils.pausar();
     }
 
     private static void gerarConsulta() {
+        Utils.limparTela();
         System.out.println("Função: gerarConsulta");
         // TODO
+        Utils.pausar();
     }
 
     private static void atualizarConsulta() {
+        Utils.limparTela();
         System.out.println("Função: atualizarConsulta");
         // TODO
+        Utils.pausar();
     }
 
     private static void cancelarConsulta() {
+        Utils.limparTela();
         System.out.println("Função: cancelarConsulta");
         // TODO
+        Utils.pausar();
     }
 
     private static void listarConsultas() {
+        Utils.limparTela();
         System.out.println("Função: listarConsultas");
         // TODO
+        Utils.pausar();
     }
 
     private static void listarConsultasPorPaciente() {
+        Utils.limparTela();
         System.out.println("Função: listarConsultasPorPaciente");
         // TODO
+        Utils.pausar();
     }
 
     private static void listarConsultasPorMedico() {
+        Utils.limparTela();
         System.out.println("Função: listarConsultasPorMedico");
         // TODO
+        Utils.pausar();
     }
 
     private static void listarConsultasPorPeriodo() {
+        Utils.limparTela();
         System.out.println("Função: listarConsultasPorPeriodo");
         // TODO
+        Utils.pausar();
     }
 
     private static void listarConsultasPorStatus() {
+        Utils.limparTela();
         System.out.println("Função: listarConsultasPorStatus");
         // TODO
+        Utils.pausar();
     }
-}s
+}
