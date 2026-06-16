@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -156,6 +157,138 @@ public class Consulta {
 
         return consultas;
     }
+
+
+
+
+
+
+
+
+
+public static List<Consulta> listarConsultasPorPeriodo(LocalDate dataInicio, LocalDate dataFim) {
+    List<Consulta> consultas = new ArrayList<>();
+    
+    if (dataInicio == null || dataFim == null) {
+        throw new IllegalArgumentException("Datas não podem ser nulas");
+    }
+    
+    if (dataInicio.isAfter(dataFim)) {
+        throw new IllegalArgumentException("Data inicial não pode ser posterior à data final");
+    }
+    
+    String sql = """
+            SELECT c.id_tb_consulta, c.data_consulta, c.horario_consulta,
+                   c.status, c.prescricao,
+                   u.cpf AS cpf_paciente,
+                   m.crm AS crm_medico
+            FROM consultas c
+            JOIN pacientes p ON c.id_tb_paciente = p.id_tb_paciente
+            JOIN usuarios u ON p.id_tb_usuario = u.id_tb_usuario
+            JOIN medicos m ON c.id_tb_medico = m.id_tb_medico
+            WHERE c.data_consulta BETWEEN ? AND ?
+            ORDER BY c.data_consulta, c.horario_consulta
+            """;
+    
+    try (Connection conn = ConexaoDB.obterConexao();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setDate(1, Date.valueOf(dataInicio));
+        stmt.setDate(2, Date.valueOf(dataFim));
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Consulta consulta = new Consulta(
+                        rs.getInt("id_tb_consulta"),
+                        rs.getDate("data_consulta").toLocalDate(),
+                        rs.getTime("horario_consulta").toLocalTime(),
+                        StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                        rs.getString("prescricao"),
+                        rs.getString("cpf_paciente"),
+                        rs.getString("crm_medico")
+                );
+                consultas.add(consulta);
+            }
+        }
+        
+    } catch (Exception e) {
+        System.err.println("Erro ao listar consultas por período: " + e.getMessage());
+    }
+    
+    return consultas;
+}
+
+public static List<Consulta> listarConsultasPorStatus(StatusConsulta status) {
+    List<Consulta> consultas = new ArrayList<>();
+    
+    if (status == null) {
+        throw new IllegalArgumentException("Status não pode ser nulo");
+    }
+    
+    String sql = """
+            SELECT c.id_tb_consulta, c.data_consulta, c.horario_consulta,
+                   c.status, c.prescricao,
+                   u.cpf AS cpf_paciente,
+                   m.crm AS crm_medico
+            FROM consultas c
+            JOIN pacientes p ON c.id_tb_paciente = p.id_tb_paciente
+            JOIN usuarios u ON p.id_tb_usuario = u.id_tb_usuario
+            JOIN medicos m ON c.id_tb_medico = m.id_tb_medico
+            WHERE c.status = ?::status_consulta
+            ORDER BY c.data_consulta, c.horario_consulta
+            """;
+    
+    try (Connection conn = ConexaoDB.obterConexao();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setString(1, status.name());
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Consulta consulta = new Consulta(
+                        rs.getInt("id_tb_consulta"),
+                        rs.getDate("data_consulta").toLocalDate(),
+                        rs.getTime("horario_consulta").toLocalTime(),
+                        StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                        rs.getString("prescricao"),
+                        rs.getString("cpf_paciente"),
+                        rs.getString("crm_medico")
+                );
+                consultas.add(consulta);
+            }
+        }
+        
+    } catch (Exception e) {
+        System.err.println("Erro ao listar consultas por status: " + e.getMessage());
+    }
+    
+    return consultas;
+}
+
+public static boolean iniciarConsulta(int idConsulta) {
+    return atualizarStatusConsulta(idConsulta, StatusConsulta.EM_ANDAMENTO, null);
+}
+
+public static boolean concluirConsulta(int idConsulta, String prescricao) {
+    if (prescricao == null || prescricao.isBlank()) {
+        throw new IllegalArgumentException("Prescrição não pode ser vazia ao concluir consulta");
+    }
+    return atualizarStatusConsulta(idConsulta, StatusConsulta.CONCLUIDA, prescricao);
+}
+
+public static boolean cancelarConsulta(int idConsulta) {
+    return atualizarStatusConsulta(idConsulta, StatusConsulta.CANCELADA, null);
+}
+
+
+
+
+
+
+
+
+
+
     public int getId() {
         return id;
     }
