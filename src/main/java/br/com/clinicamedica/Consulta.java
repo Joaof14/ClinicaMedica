@@ -15,21 +15,20 @@ public class Consulta {
     private int id;
     private LocalDate data;
     private LocalTime horario;
-    private StatusConsulta status;
+    private Status status;
     private String prescricao;
     private String cpfPaciente;
     private String crmMedico;
 
-    public Consulta(String cpfPaciente, String crmMedico, LocalDate data, LocalTime horario, int id, String prescricao, StatusConsulta status) {
-        this.cpfPaciente = cpfPaciente;
-        this.crmMedico = crmMedico;
+    public Consulta(int id, LocalDate data, LocalTime horario, Status status, String prescricao,  String cpfPaciente, String crmMedico) {
+        this.id = id;
         this.data = data;
         this.horario = horario;
-        this.id = id;
-        this.prescricao = prescricao;
         this.status = status;
+        this.prescricao = prescricao;
+        this.cpfPaciente = cpfPaciente;
+        this.crmMedico = crmMedico;
     }
-
 
     public void verConsulta() {
         System.out.println("Imprimindo Consulta:\n");
@@ -118,7 +117,7 @@ public class Consulta {
                                     id,
                                     data,
                                     horario,
-                                    StatusConsulta.AGENDADA,
+                                    Status.AGENDADA,
                                     null,
                                     cpfPaciente,
                                     crmMedico
@@ -136,7 +135,7 @@ public class Consulta {
         return null;
     }
 
-    public void atualizarConsulta(int id, LocalDate data, LocalTime horario, StatusConsulta status, String prescricao) {
+    public void atualizarConsulta(int id, LocalDate data, LocalTime horario, Status status, String prescricao) {
         // Validar se a consulta existe no banco
         String sqlCheck = "SELECT status FROM consultas WHERE id_tb_consulta = ?";
         String sqlUpdate = """
@@ -147,7 +146,7 @@ public class Consulta {
         
         try (Connection conn = ConexaoDB.obterConexao()) {
             // Verificar se a consulta existe e obter status atual
-            StatusConsulta statusAtual = null;
+            Status statusAtual = null;
             try (PreparedStatement stmtCheck = conn.prepareStatement(sqlCheck)) {
                 stmtCheck.setInt(1, id);
                 try (ResultSet rs = stmtCheck.executeQuery()) {
@@ -155,7 +154,7 @@ public class Consulta {
                         System.out.println("Consulta com ID " + id + " não encontrada.");
                         return;
                     }
-                    statusAtual = StatusConsulta.valueOf(rs.getString("status").replace(" ", "_"));
+                    statusAtual = Status.valueOf(rs.getString("status").replace(" ", "_"));
                 }
             }
             
@@ -195,7 +194,7 @@ public class Consulta {
 
     public void iniciarConsulta() {
         // Verificar se a consulta está no status AGENDADA
-        if (this.status != StatusConsulta.AGENDADA) {
+        if (this.status != Status.AGENDADA) {
             System.out.println("Não é possível iniciar uma consulta que não está AGENDADA. Status atual: " + this.status);
             return;
         }
@@ -208,9 +207,9 @@ public class Consulta {
         }
         
         // Atualizar status no banco
-        boolean atualizado = atualizarStatusConsulta(this.id, StatusConsulta.EM_ANDAMENTO, null);
+        boolean atualizado = atualizarStatus(this.id, Status.EM_ANDAMENTO, null);
         if (atualizado) {
-            this.status = StatusConsulta.EM_ANDAMENTO;
+            this.status = Status.EM_ANDAMENTO;
             System.out.println("Consulta " + this.id + " iniciada com sucesso!");
         }
     }
@@ -221,15 +220,15 @@ public class Consulta {
         }
         
         // Verificar se a consulta está em andamento
-        if (this.status != StatusConsulta.EM_ANDAMENTO) {
+        if (this.status != Status.EM_ANDAMENTO) {
             System.out.println("Não é possível concluir uma consulta que não está EM_ANDAMENTO. Status atual: " + this.status);
             return;
         }
         
         // Atualizar status e prescrição no banco
-        boolean atualizado = atualizarStatusConsulta(this.id, StatusConsulta.CONCLUIDA, prescricao);
+        boolean atualizado = atualizarStatus(this.id, Status.CONCLUIDA, prescricao);
         if (atualizado) {
-            this.status = StatusConsulta.CONCLUIDA;
+            this.status = Status.CONCLUIDA;
             this.prescricao = prescricao;
             System.out.println("Consulta " + this.id + " concluída com sucesso!");
         }
@@ -237,20 +236,20 @@ public class Consulta {
 
     public void cancelarConsulta() {
         // Verificar se a consulta pode ser cancelada (AGENDADA ou EM_ANDAMENTO)
-        if (this.status == StatusConsulta.CONCLUIDA) {
+        if (this.status == Status.CONCLUIDA) {
             System.out.println("Não é possível cancelar uma consulta já concluída.");
             return;
         }
         
-        if (this.status == StatusConsulta.CANCELADA) {
+        if (this.status == Status.CANCELADA) {
             System.out.println("Esta consulta já está cancelada.");
             return;
         }
         
         // Atualizar status no banco
-        boolean atualizado = atualizarStatusConsulta(this.id, StatusConsulta.CANCELADA, null);
+        boolean atualizado = atualizarStatus(this.id, Status.CANCELADA, null);
         if (atualizado) {
-            this.status = StatusConsulta.CANCELADA;
+            this.status = Status.CANCELADA;
             System.out.println("Consulta " + this.id + " cancelada com sucesso!");
         }
     }
@@ -262,12 +261,12 @@ public class Consulta {
         }
         
         // Verificar se a consulta pode ser deletada (apenas AGENDADA ou CANCELADA)
-        if (consulta.getStatus() == StatusConsulta.EM_ANDAMENTO) {
+        if (consulta.getStatus() == Status.EM_ANDAMENTO) {
             System.out.println("Não é possível deletar uma consulta em andamento. Cancela-la primeiro.");
             return;
         }
         
-        if (consulta.getStatus() == StatusConsulta.CONCLUIDA) {
+        if (consulta.getStatus() == Status.CONCLUIDA) {
             System.out.println("Não é possível deletar uma consulta já concluída.");
             return;
         }
@@ -314,7 +313,7 @@ public class Consulta {
                         rs.getInt("id_tb_consulta"),
                         rs.getDate("data_consulta").toLocalDate(),
                         rs.getTime("horario_consulta").toLocalTime(),
-                        StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                        Status.valueOf(rs.getString("status").replace(" ", "_")),
                         rs.getString("prescricao"),
                         rs.getString("cpf_paciente"),
                         rs.getString("crm_medico")
@@ -360,7 +359,7 @@ public class Consulta {
                             rs.getInt("id_tb_consulta"),
                             rs.getDate("data_consulta").toLocalDate(),
                             rs.getTime("horario_consulta").toLocalTime(),
-                            StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                            Status.valueOf(rs.getString("status").replace(" ", "_")),
                             rs.getString("prescricao"),
                             rs.getString("cpf_paciente"),
                             rs.getString("crm_medico")
@@ -407,7 +406,7 @@ public class Consulta {
                             rs.getInt("id_tb_consulta"),
                             rs.getDate("data_consulta").toLocalDate(),
                             rs.getTime("horario_consulta").toLocalTime(),
-                            StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                            Status.valueOf(rs.getString("status").replace(" ", "_")),
                             rs.getString("prescricao"),
                             rs.getString("cpf_paciente"),
                             rs.getString("crm_medico")
@@ -459,7 +458,7 @@ public class Consulta {
                             rs.getInt("id_tb_consulta"),
                             rs.getDate("data_consulta").toLocalDate(),
                             rs.getTime("horario_consulta").toLocalTime(),
-                            StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                            Status.valueOf(rs.getString("status").replace(" ", "_")),
                             rs.getString("prescricao"),
                             rs.getString("cpf_paciente"),
                             rs.getString("crm_medico")
@@ -475,7 +474,7 @@ public class Consulta {
         return consultas;
     }
 
-    public static List<Consulta> listarConsultasPorStatus(StatusConsulta status) {
+    public static List<Consulta> listarConsultasPorStatus(Status status) {
         List<Consulta> consultas = new ArrayList<>();
         
         if (status == null) {
@@ -506,7 +505,7 @@ public class Consulta {
                             rs.getInt("id_tb_consulta"),
                             rs.getDate("data_consulta").toLocalDate(),
                             rs.getTime("horario_consulta").toLocalTime(),
-                            StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                            Status.valueOf(rs.getString("status").replace(" ", "_")),
                             rs.getString("prescricao"),
                             rs.getString("cpf_paciente"),
                             rs.getString("crm_medico")
@@ -522,12 +521,12 @@ public class Consulta {
         return consultas;
     }
 
-    private static boolean validarTransicaoStatus(StatusConsulta atual, StatusConsulta novo) {
+    private static boolean validarTransicaoStatus(Status atual, Status novo) {
         switch (atual) {
             case AGENDADA:
-                return novo == StatusConsulta.EM_ANDAMENTO || novo == StatusConsulta.CANCELADA;
+                return novo == Status.EM_ANDAMENTO || novo == Status.CANCELADA;
             case EM_ANDAMENTO:
-                return novo == StatusConsulta.CONCLUIDA || novo == StatusConsulta.CANCELADA;
+                return novo == Status.CONCLUIDA || novo == Status.CANCELADA;
             case CONCLUIDA:
                 return false;
             case CANCELADA:
@@ -537,14 +536,14 @@ public class Consulta {
         }
     }
 
-    private static boolean atualizarStatusConsulta(int idConsulta, StatusConsulta novoStatus, String prescricao) {
+    private static boolean atualizarStatus(int idConsulta, Status novoStatus, String prescricao) {
         String sqlSelect = "SELECT status FROM consultas WHERE id_tb_consulta = ?";
         String sqlUpdate = "UPDATE consultas SET status = ?::status_consulta" + 
                           (prescricao != null ? ", prescricao = ?" : "") + 
                           " WHERE id_tb_consulta = ?";
         
         try (Connection conn = ConexaoDB.obterConexao()) {
-            StatusConsulta statusAtual;
+            Status statusAtual;
             try (PreparedStatement stmtSelect = conn.prepareStatement(sqlSelect)) {
                 stmtSelect.setInt(1, idConsulta);
                 try (ResultSet rs = stmtSelect.executeQuery()) {
@@ -552,7 +551,7 @@ public class Consulta {
                         System.out.println("Consulta não encontrada com ID: " + idConsulta);
                         return false;
                     }
-                    statusAtual = StatusConsulta.valueOf(rs.getString("status").replace(" ", "_"));
+                    statusAtual = Status.valueOf(rs.getString("status").replace(" ", "_"));
                 }
             }
             
@@ -598,7 +597,7 @@ public class Consulta {
         return horario;
     }
 
-    public StatusConsulta getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -626,7 +625,7 @@ public class Consulta {
         this.horario = horario;
     }
 
-    public void setStatus(StatusConsulta status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
