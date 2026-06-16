@@ -16,9 +16,8 @@ public class MenuMedico {
             System.out.println("|  1 · Ver consultas                               |");
             System.out.println("|  2 · Iniciar consulta                            |");
             System.out.println("|  3 · Concluir consulta                           |");
-            System.out.println("|  4 · Registrar diagnóstico                       |");
-            System.out.println("|  5 · Registrar prescrição                        |");
-            System.out.println("|  6 · Atualizar status da consulta                |");
+            System.out.println("|  4 · Registrar prescrição                        |");
+            System.out.println("|  5 · Atualizar status da consulta                |");
             System.out.println("|  0 · Voltar                                      |");
             System.out.println("|--------------------------------------------------|");
 
@@ -28,8 +27,7 @@ public class MenuMedico {
                 case 1 -> verConsultas();
                 case 2 -> iniciarConsulta();
                 case 3 -> concluirConsulta();
-                case 4 -> registrarDiagnostico();
-                case 5 -> registrarPrescricao();
+                case 4 -> registrarPrescricao();
                 case 6 -> atualizarStatusConsulta();
                 case 0 -> { }
                 default -> Utils.msgOpcaoInvalida();
@@ -54,13 +52,6 @@ public class MenuMedico {
     private static void concluirConsulta() {
         Utils.limparTela();
         System.out.println("Função: concluirConsulta");
-        // TODO
-        Utils.pausar();
-    }
-
-    private static void registrarDiagnostico() {
-        Utils.limparTela();
-        System.out.println("Função: registrarDiagnostico");
         // TODO
         Utils.pausar();
     }
