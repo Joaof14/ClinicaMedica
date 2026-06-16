@@ -130,6 +130,22 @@ public class Medico extends Funcionario {
         return medicos;
     }
 
+    public String getAreaDeAtuacao() {
+        return areaDeAtuacao;
+    }
+
+    public void setAreaDeAtuacao(String areaDeAtuacao) {
+        this.areaDeAtuacao = areaDeAtuacao;
+    }
+
+    public String getCrm() {
+        return crm;
+    }
+
+    public void setCrm(String crm) {
+        this.crm = crm;
+    }
+
     // Adequar para trazer o construtor da classe mãe
     @Override
     public String toString() {
