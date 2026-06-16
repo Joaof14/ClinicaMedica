@@ -19,17 +19,17 @@ public class MenuPrincipal {
         System.out.println("|--------------------------------------------------|");
         System.out.println();
 
-        String perfil = menuLogin();
+        boolean loginRealizado = menuLogin();
 
-        if (perfil != null) {
-            menuSelecaoPerfil(perfil);
+        if (loginRealizado) {
+            menuSelecaoPerfil();
         }
 
         Utils.fecharScanner();
         System.out.println("\nSistema encerrado. Até logo!");
     }
 
-    private static String menuLogin() {
+    private static boolean menuLogin() {
         int tentativas = 3;
 
         while (tentativas > 0) {
@@ -40,15 +40,14 @@ public class MenuPrincipal {
 
             if (Usuario.autenticar(login, senha)) {
                 loginAutenticado = login;
-                System.out.println("\nLogin realizado com sucesso!");
+                usuarioLogado = buscarUsuarioPorLogin(loginAutenticado);
 
-                String perfil = identificarPerfil(loginAutenticado);
-
-                if (perfil != null) {
-                    return perfil;
+                if (usuarioLogado != null) {
+                    System.out.println("\nLogin realizado com sucesso!");
+                    return true;
                 } else {
-                    System.out.println("Usuário autenticado, mas o perfil não pôde ser identificado.");
-                    return null;
+                    System.out.println("\nUsuário autenticado, mas não foi localizado no sistema.");
+                    return false;
                 }
             }
 
@@ -62,83 +61,30 @@ public class MenuPrincipal {
         }
 
         System.out.println("\nNúmero máximo de tentativas atingido.");
-        return null;
+        return false;
     }
 
-    private static String identificarPerfil(String login) {
-        usuarioLogado = buscarPacientePorLogin(login);
-        if (usuarioLogado != null) {
-            return "PACIENTE";
-        }
+    private static Usuario buscarUsuarioPorLogin(String login) {
+        List<Usuario> usuarios = Usuario.listarUsuarios();
 
-        usuarioLogado = buscarMedicoPorLogin(login);
-        if (usuarioLogado != null) {
-            return "MEDICO";
-        }
-
-        usuarioLogado = buscarFuncionarioPorLogin(login);
-        if (usuarioLogado != null) {
-            return "FUNCIONARIO";
-        }
-
-        return null;
-    }
-
-    private static Paciente buscarPacientePorLogin(String login) {
-        List<Paciente> pacientes = Paciente.listarPacientes();
-
-        for (Paciente paciente : pacientes) {
-            if (paciente.getLogin().equals(login)) {
-                return paciente;
+        for (Usuario usuario : usuarios) {
+            if (usuario.getLogin().equals(login)) {
+                return usuario;
             }
         }
 
         return null;
     }
 
-    private static Medico buscarMedicoPorLogin(String login) {
-        List<Medico> medicos = Medico.listarMedicos();
-
-        for (Medico medico : medicos) {
-            if (medico.getLogin().equals(login)) {
-                return medico;
-            }
+    private static void menuSelecaoPerfil() {
+        if (usuarioLogado instanceof Paciente paciente) {
+            MenuPaciente.exibir(paciente);
+        } else if (usuarioLogado instanceof Medico medico) {
+            MenuMedico.exibir(medico);
+        } else if (usuarioLogado instanceof Funcionario funcionario) {
+            MenuFuncionario.exibir(funcionario);
+        } else {
+            System.out.println("Perfil não reconhecido.");
         }
-
-        return null;
     }
-
-    private static Funcionario buscarFuncionarioPorLogin(String login) {
-        List<Funcionario> funcionarios = Funcionario.listarFuncionario();
-
-        for (Funcionario funcionario : funcionarios) {
-            if (funcionario.getLogin().equals(login)) {
-                return funcionario;
-            }
-        }
-
-        return null;
-    }
-
-    private static void menuSelecaoPerfil(String perfil) {
-    switch (perfil) {
-        case "PACIENTE" -> {
-            if (usuarioLogado instanceof Paciente paciente) {
-                MenuPaciente.exibir(paciente);
-            }
-        }
-        case "FUNCIONARIO" -> {
-            if (usuarioLogado instanceof Funcionario funcionario){
-                MenuFuncionario.exibir(funcionario);
-            }
-           
-        }
-        case "MEDICO" -> {
-            if (usuarioLogado instanceof Medico medico) {
-                MenuMedico.exibir(medico);
-            }
-        }
-        default -> System.out.println("Perfil não reconhecido.");
-    }
-}
 }
