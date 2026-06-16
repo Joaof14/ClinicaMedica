@@ -166,10 +166,10 @@ public abstract class Usuario {
     public static List<Usuario> listarUsuarios() {
         List<Usuario> todosUsuarios = new ArrayList<>();
         // TODO: implementar listarPaciente e descomentar
-        // List<Paciente> pacientes = Paciente.listarPaciente();
+        List<Paciente> pacientes = Paciente.listarPacientes();
         List<Funcionario> funcionarios = Funcionario.listarFuncionario();
 
-        // todosUsuarios.addAll(funcionarios);
+        todosUsuarios.addAll(pacientes);
         todosUsuarios.addAll(funcionarios);
 
         return todosUsuarios;

@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Time;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +14,20 @@ public class Consulta {
     private int id;
     private LocalDate data;
     private LocalTime horario;
-    private StatusConsulta status;
+    private Status status;
     private String prescricao;
     private String cpfPaciente;
     private String crmMedico;
 
 
+<<<<<<< HEAD
     public Consulta(int id, LocalDate data, LocalTime horario, StatusConsulta status, String prescricao,
+=======
+    
+
+
+    public Consulta(int id, LocalDate data, LocalTime horario, Status status, String prescricao,
+>>>>>>> 98a43144e6aa0aa6911918fef1e41e8f519a01c2
             String cpfPaciente, String crmMedico) {
         this.id = id;
         this.data = data;
@@ -140,7 +146,7 @@ public class Consulta {
                         rs.getInt("id_tb_consulta"),
                         rs.getDate("data_consulta").toLocalDate(),
                         rs.getTime("horario_consulta").toLocalTime(),
-                        StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                        Status.valueOf(rs.getString("status").replace(" ", "_")),
                         rs.getString("prescricao"),
                         rs.getString("cpf_paciente"),
                         rs.getString("crm_medico")
@@ -404,7 +410,7 @@ public static List<Consulta> listarConsultasPorPeriodo(LocalDate dataInicio, Loc
                         rs.getInt("id_tb_consulta"),
                         rs.getDate("data_consulta").toLocalDate(),
                         rs.getTime("horario_consulta").toLocalTime(),
-                        StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                        Status.valueOf(rs.getString("status").replace(" ", "_")),
                         rs.getString("prescricao"),
                         rs.getString("cpf_paciente"),
                         rs.getString("crm_medico")
@@ -420,7 +426,7 @@ public static List<Consulta> listarConsultasPorPeriodo(LocalDate dataInicio, Loc
     return consultas;
 }
 
-public static List<Consulta> listarConsultasPorStatus(StatusConsulta status) {
+public static List<Consulta> listarConsultasPorStatus(Status status) {
     List<Consulta> consultas = new ArrayList<>();
     
     if (status == null) {
@@ -451,7 +457,7 @@ public static List<Consulta> listarConsultasPorStatus(StatusConsulta status) {
                         rs.getInt("id_tb_consulta"),
                         rs.getDate("data_consulta").toLocalDate(),
                         rs.getTime("horario_consulta").toLocalTime(),
-                        StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                        Status.valueOf(rs.getString("status").replace(" ", "_")),
                         rs.getString("prescricao"),
                         rs.getString("cpf_paciente"),
                         rs.getString("crm_medico")
@@ -468,6 +474,7 @@ public static List<Consulta> listarConsultasPorStatus(StatusConsulta status) {
 }
 
 
+<<<<<<< HEAD
 private static boolean validarTransicaoStatus(StatusConsulta atual, StatusConsulta novo) {
     // Regras de transição de status
     switch (atual) {
@@ -482,6 +489,11 @@ private static boolean validarTransicaoStatus(StatusConsulta atual, StatusConsul
         default:
             return false;
     }
+=======
+
+public static boolean iniciarConsulta(int idConsulta) {
+    return atualizarStatus(idConsulta, Status.EM_ANDAMENTO, null);
+>>>>>>> 98a43144e6aa0aa6911918fef1e41e8f519a01c2
 }
 
 
@@ -511,6 +523,7 @@ public void concluirConsulta(String prescricao) {
     if (prescricao == null || prescricao.isBlank()) {
         throw new IllegalArgumentException("Prescrição não pode ser vazia ao concluir consulta");
     }
+<<<<<<< HEAD
     
     // Verificar se a consulta está em andamento
     if (this.status != StatusConsulta.EM_ANDAMENTO) {
@@ -545,6 +558,13 @@ public void cancelarConsulta() {
         this.status = StatusConsulta.CANCELADA;
         System.out.println("Consulta " + this.id + " cancelada com sucesso!");
     }
+=======
+    return atualizarStatus(idConsulta, Status.CONCLUIDA, prescricao);
+}
+
+public static boolean cancelarConsulta(int idConsulta) {
+    return atualizarStatus(idConsulta, Status.CANCELADA, null);
+>>>>>>> 98a43144e6aa0aa6911918fef1e41e8f519a01c2
 }
 
 
@@ -580,13 +600,13 @@ public void cancelarConsulta() {
 
 
 
-    public StatusConsulta getStatus() {
+    public Status getStatus() {
         return status;
     }
 
 
 
-    public void setStatus(StatusConsulta status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
