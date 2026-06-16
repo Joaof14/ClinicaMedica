@@ -21,9 +21,6 @@ public class Consulta {
     private String crmMedico;
 
 
-    
-
-
     public Consulta(int id, LocalDate data, LocalTime horario, StatusConsulta status, String prescricao,
             String cpfPaciente, String crmMedico) {
         this.id = id;
@@ -163,6 +160,211 @@ public class Consulta {
 
 
 
+public static void atualizarConsulta(Consulta consulta, int id, LocalDate data, LocalTime horario, 
+                                   StatusConsulta status, String prescricao) {
+    if (consulta == null) {
+        throw new IllegalArgumentException("Consulta não pode ser nula");
+    }
+    
+    // Validar se a consulta existe no banco
+    String sqlCheck = "SELECT status FROM consultas WHERE id_tb_consulta = ?";
+    String sqlUpdate = """
+            UPDATE consultas 
+            SET data_consulta = ?, horario_consulta = ?, status = ?::status_consulta, prescricao = ?
+            WHERE id_tb_consulta = ?
+            """;
+    
+    try (Connection conn = ConexaoDB.obterConexao()) {
+        // Verificar se a consulta existe e obter status atual
+        StatusConsulta statusAtual = null;
+        try (PreparedStatement stmtCheck = conn.prepareStatement(sqlCheck)) {
+            stmtCheck.setInt(1, id);
+            try (ResultSet rs = stmtCheck.executeQuery()) {
+                if (!rs.next()) {
+                    System.out.println("Consulta com ID " + id + " não encontrada.");
+                    return;
+                }
+                statusAtual = StatusConsulta.valueOf(rs.getString("status").replace(" ", "_"));
+            }
+        }
+        
+        // Validar se a transição de status é permitida (apenas se o status for diferente)
+        if (status != null && status != statusAtual) {
+            if (!validarTransicaoStatus(statusAtual, status)) {
+                System.out.println("Transição de status inválida: " + statusAtual + " -> " + status);
+                return;
+            }
+        }
+        
+        // Atualizar a consulta no banco
+        try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
+            stmtUpdate.setDate(1, Date.valueOf(data));
+            stmtUpdate.setTime(2, Time.valueOf(horario));
+            stmtUpdate.setString(3, status != null ? status.name() : statusAtual.name());
+            stmtUpdate.setString(4, prescricao != null ? prescricao : consulta.getPrescricao());
+            stmtUpdate.setInt(5, id);
+            
+            int linhasAfetadas = stmtUpdate.executeUpdate();
+            if (linhasAfetadas > 0) {
+                // Atualizar o objeto consulta
+                consulta.setId(id);
+                consulta.setData(data);
+                consulta.setHorario(horario);
+                if (status != null) consulta.setStatus(status);
+                if (prescricao != null) consulta.setPrescricao(prescricao);
+                
+                System.out.println("Consulta atualizada com sucesso! ID: " + id);
+            }
+        }
+        
+    } catch (Exception e) {
+        System.err.println("Erro ao atualizar consulta: " + e.getMessage());
+    }
+}
+
+public static void deletarConsulta(Consulta consulta) {
+    if (consulta == null) {
+        System.out.println("Erro: A consulta fornecida é nula");
+        return;
+    }
+    
+    // Verificar se a consulta pode ser deletada (apenas AGENDADA ou CANCELADA)
+    if (consulta.getStatus() == StatusConsulta.EM_ANDAMENTO) {
+        System.out.println("Não é possível deletar uma consulta em andamento. Cancela-la primeiro.");
+        return;
+    }
+    
+    if (consulta.getStatus() == StatusConsulta.CONCLUIDA) {
+        System.out.println("Não é possível deletar uma consulta já concluída.");
+        return;
+    }
+    
+    String sql = "DELETE FROM consultas WHERE id_tb_consulta = ?";
+    
+    try (Connection conn = ConexaoDB.obterConexao();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setInt(1, consulta.getId());
+        
+        int linhasAfetadas = stmt.executeUpdate();
+        if (linhasAfetadas > 0) {
+            System.out.println("Consulta ID " + consulta.getId() + " deletada com sucesso!");
+        } else {
+            System.out.println("Consulta não encontrada para deletar.");
+        }
+        
+    } catch (Exception e) {
+        System.err.println("Erro ao deletar consulta: " + e.getMessage());
+    }
+}
+
+public static List<Consulta> listarConsultasPorPaciente(String cpf) {
+    List<Consulta> consultas = new ArrayList<>();
+    
+    if (cpf == null || cpf.isBlank()) {
+        throw new IllegalArgumentException("CPF do paciente não pode ser nulo ou vazio");
+    }
+    
+    String sql = """
+            SELECT c.id_tb_consulta, c.data_consulta, c.horario_consulta,
+                   c.status, c.prescricao,
+                   u.cpf AS cpf_paciente,
+                   m.crm AS crm_medico
+            FROM consultas c
+            JOIN pacientes p ON c.id_tb_paciente = p.id_tb_paciente
+            JOIN usuarios u ON p.id_tb_usuario = u.id_tb_usuario
+            JOIN medicos m ON c.id_tb_medico = m.id_tb_medico
+            WHERE u.cpf = ?
+            ORDER BY c.data_consulta DESC, c.horario_consulta DESC
+            """;
+    
+    try (Connection conn = ConexaoDB.obterConexao();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setString(1, cpf);
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Consulta consulta = new Consulta(
+                        rs.getInt("id_tb_consulta"),
+                        rs.getDate("data_consulta").toLocalDate(),
+                        rs.getTime("horario_consulta").toLocalTime(),
+                        StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                        rs.getString("prescricao"),
+                        rs.getString("cpf_paciente"),
+                        rs.getString("crm_medico")
+                );
+                consultas.add(consulta);
+            }
+        }
+        
+    } catch (Exception e) {
+        System.err.println("Erro ao listar consultas por paciente: " + e.getMessage());
+    }
+    
+    return consultas;
+}
+
+public static List<Consulta> listarConsultasPorMedico(String crm) {
+    List<Consulta> consultas = new ArrayList<>();
+    
+    if (crm == null || crm.isBlank()) {
+        throw new IllegalArgumentException("CRM do médico não pode ser nulo ou vazio");
+    }
+    
+    String sql = """
+            SELECT c.id_tb_consulta, c.data_consulta, c.horario_consulta,
+                   c.status, c.prescricao,
+                   u.cpf AS cpf_paciente,
+                   m.crm AS crm_medico
+            FROM consultas c
+            JOIN pacientes p ON c.id_tb_paciente = p.id_tb_paciente
+            JOIN usuarios u ON p.id_tb_usuario = u.id_tb_usuario
+            JOIN medicos m ON c.id_tb_medico = m.id_tb_medico
+            WHERE m.crm = ?
+            ORDER BY c.data_consulta, c.horario_consulta
+            """;
+    
+    try (Connection conn = ConexaoDB.obterConexao();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setString(1, crm);
+        
+        try (ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Consulta consulta = new Consulta(
+                        rs.getInt("id_tb_consulta"),
+                        rs.getDate("data_consulta").toLocalDate(),
+                        rs.getTime("horario_consulta").toLocalTime(),
+                        StatusConsulta.valueOf(rs.getString("status").replace(" ", "_")),
+                        rs.getString("prescricao"),
+                        rs.getString("cpf_paciente"),
+                        rs.getString("crm_medico")
+                );
+                consultas.add(consulta);
+            }
+        }
+        
+    } catch (Exception e) {
+        System.err.println("Erro ao listar consultas por médico: " + e.getMessage());
+    }
+    
+    return consultas;
+}
+
+// Método auxiliar - adicione o campo horario que estava faltando
+public LocalTime getHorario() {
+    return horario;
+}
+
+public void setHorario(LocalTime horario) {
+    this.horario = horario;
+}
+
+
+
+
+
 
 
 
@@ -265,19 +467,84 @@ public static List<Consulta> listarConsultasPorStatus(StatusConsulta status) {
     return consultas;
 }
 
-public static boolean iniciarConsulta(int idConsulta) {
-    return atualizarStatusConsulta(idConsulta, StatusConsulta.EM_ANDAMENTO, null);
+
+private static boolean validarTransicaoStatus(StatusConsulta atual, StatusConsulta novo) {
+    // Regras de transição de status
+    switch (atual) {
+        case AGENDADA:
+            return novo == StatusConsulta.EM_ANDAMENTO || novo == StatusConsulta.CANCELADA;
+        case EM_ANDAMENTO:
+            return novo == StatusConsulta.CONCLUIDA || novo == StatusConsulta.CANCELADA;
+        case CONCLUIDA:
+            return false; // Consulta concluída não pode mais ser alterada
+        case CANCELADA:
+            return false; // Consulta cancelada não pode mais ser alterada
+        default:
+            return false;
+    }
 }
 
-public static boolean concluirConsulta(int idConsulta, String prescricao) {
+
+public void iniciarConsulta() {
+    // Verificar se a consulta está no status AGENDADA
+    if (this.status != StatusConsulta.AGENDADA) {
+        System.out.println("Não é possível iniciar uma consulta que não está AGENDADA. Status atual: " + this.status);
+        return;
+    }
+    
+    // Verificar se a data/hora da consulta já passou
+    LocalDateTime dataHoraConsulta = LocalDateTime.of(this.data, this.horario);
+    if (dataHoraConsulta.isBefore(LocalDateTime.now())) {
+        System.out.println("A data/hora da consulta já passou. Não é possível iniciar.");
+        return;
+    }
+    
+    // Atualizar status no banco
+    boolean atualizado = atualizarStatusConsulta(this.id, StatusConsulta.EM_ANDAMENTO, null);
+    if (atualizado) {
+        this.status = StatusConsulta.EM_ANDAMENTO;
+        System.out.println("Consulta " + this.id + " iniciada com sucesso!");
+    }
+}
+
+public void concluirConsulta(String prescricao) {
     if (prescricao == null || prescricao.isBlank()) {
         throw new IllegalArgumentException("Prescrição não pode ser vazia ao concluir consulta");
     }
-    return atualizarStatusConsulta(idConsulta, StatusConsulta.CONCLUIDA, prescricao);
+    
+    // Verificar se a consulta está em andamento
+    if (this.status != StatusConsulta.EM_ANDAMENTO) {
+        System.out.println("Não é possível concluir uma consulta que não está EM_ANDAMENTO. Status atual: " + this.status);
+        return;
+    }
+    
+    // Atualizar status e prescrição no banco
+    boolean atualizado = atualizarStatusConsulta(this.id, StatusConsulta.CONCLUIDA, prescricao);
+    if (atualizado) {
+        this.status = StatusConsulta.CONCLUIDA;
+        this.prescricao = prescricao;
+        System.out.println("Consulta " + this.id + " concluída com sucesso!");
+    }
 }
 
-public static boolean cancelarConsulta(int idConsulta) {
-    return atualizarStatusConsulta(idConsulta, StatusConsulta.CANCELADA, null);
+public void cancelarConsulta() {
+    // Verificar se a consulta pode ser cancelada (AGENDADA ou EM_ANDAMENTO)
+    if (this.status == StatusConsulta.CONCLUIDA) {
+        System.out.println("Não é possível cancelar uma consulta já concluída.");
+        return;
+    }
+    
+    if (this.status == StatusConsulta.CANCELADA) {
+        System.out.println("Esta consulta já está cancelada.");
+        return;
+    }
+    
+    // Atualizar status no banco
+    boolean atualizado = atualizarStatusConsulta(this.id, StatusConsulta.CANCELADA, null);
+    if (atualizado) {
+        this.status = StatusConsulta.CANCELADA;
+        System.out.println("Consulta " + this.id + " cancelada com sucesso!");
+    }
 }
 
 
