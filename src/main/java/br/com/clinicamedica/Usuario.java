@@ -21,7 +21,6 @@ public abstract class Usuario {
     private String senha;
     private boolean ativo;
 
-    /* cadastrarUsuario se tornou o construtor Usuario conforme aula 29_05_26 */
     public Usuario(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
             boolean ativo) {
         setNome(nome);
@@ -34,7 +33,6 @@ public abstract class Usuario {
         setAtivo(ativo);
     }
 
-    /* DIFERENTE DO UML: apenas cadastra usuario no banco */
     public void cadastrarUsuario(Usuario usuario) {
         String query = "INSERT INTO usuarios (nome, idade, sexo, cpf, telefone, login, senha, ativo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -133,7 +131,6 @@ public abstract class Usuario {
 
     }
 
-    /* Implementação para autenticar usuário */
     public static boolean autenticar(String login, String senha) {
         String sql = "SELECT * FROM usuarios WHERE login = ? AND senha = ? AND ativo = true";
 
@@ -151,7 +148,6 @@ public abstract class Usuario {
         }
     }
 
-    /* Implementação para listar todos os usuários */
     public static List<Usuario> listarUsuarios() {
         List<Usuario> todosUsuarios = new ArrayList<>();
         List<Paciente> pacientes = Paciente.listarPacientes();

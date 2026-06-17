@@ -13,8 +13,6 @@ public class ConexaoDB {
     private static final String USER;
     private static final String PASSWORD;
 
-   
-
     static {
         try (InputStream input = ConexaoDB.class
                 .getClassLoader()

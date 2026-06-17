@@ -14,7 +14,8 @@ public class Medico extends Funcionario {
     private String crm;
 
     private static final Set<String> AREAS_DE_ATUACAO_VALIDAS = Set.of(
-            "UTI", "Ambulatorio", "pronto-socorro", "urgencia", "medicina-preventiva");
+            "uti", "ambulatorio", "pronto-socorro", "urgencia", "medicina-preventiva",
+            "neurologia", "pneumologia", "ortopedia", "cardiologia", "clínica geral");
 
     public Medico(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
             boolean ativo, double salario, int cargaHorariaSemanal, String turno, boolean atendente,
@@ -30,9 +31,9 @@ public class Medico extends Funcionario {
         if (crm == null || crm.trim().isEmpty()) {
             throw new IllegalArgumentException("CRM nao pode ser vazio.");
         }
-        if (!crm.matches("[A-Z]{2}-\\d{4,6}")) {
+        if (!crm.matches("(CRM-)?[A-Z]{2}-\\d{4,6}")) {
             throw new IllegalArgumentException(
-                    String.format("CRM INVALIDO: %s. Formato deve ser 'UF-1234'.", crm));
+                    String.format("CRM INVALIDO: %s. Formato deve ser 'UF-1234' ou 'CRM-UF-1234'.", crm));
         }
     }
 
@@ -40,7 +41,7 @@ public class Medico extends Funcionario {
         if (areaDeAtuacao == null || areaDeAtuacao.trim().isEmpty()) {
             throw new IllegalArgumentException("Area de atuacao nao pode ser vazia.");
         }
-        if (!AREAS_DE_ATUACAO_VALIDAS.contains(areaDeAtuacao)) {
+        if (!AREAS_DE_ATUACAO_VALIDAS.contains(areaDeAtuacao.toLowerCase())) {
             throw new IllegalArgumentException(
                     String.format("Area de atuacao invalida: %s.", areaDeAtuacao));
         }
@@ -78,7 +79,8 @@ public class Medico extends Funcionario {
             conn.setAutoCommit(false);
 
             long idUsuario;
-            try (PreparedStatement stmtUsuario = conn.prepareStatement(sqlInsertUsuario, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement stmtUsuario = conn.prepareStatement(sqlInsertUsuario,
+                    Statement.RETURN_GENERATED_KEYS)) {
                 stmtUsuario.setString(1, nome);
                 stmtUsuario.setInt(2, idade);
                 stmtUsuario.setString(3, sexo);
@@ -98,7 +100,8 @@ public class Medico extends Funcionario {
             }
 
             long idFuncionario;
-            try (PreparedStatement stmtFuncionario = conn.prepareStatement(sqlInsertFuncionario, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement stmtFuncionario = conn.prepareStatement(sqlInsertFuncionario,
+                    Statement.RETURN_GENERATED_KEYS)) {
                 stmtFuncionario.setLong(1, idUsuario);
                 stmtFuncionario.setDouble(2, salario);
                 stmtFuncionario.setInt(3, cargaHorariaSemanal);
@@ -158,7 +161,7 @@ public class Medico extends Funcionario {
         String sql = "UPDATE medicos SET area_de_atuacao = ?, crm = ? WHERE crm = ?";
 
         try (Connection conn = ConexaoDB.obterConexao();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, novaAreaDeAtuacao);
             stmt.setString(2, novoCRM);
@@ -188,12 +191,12 @@ public class Medico extends Funcionario {
         crm = crm.trim().toUpperCase();
 
         String sqlBusca = """
-            SELECT u.id_tb_usuario, f.id_tb_funcionario
-            FROM medicos m
-            JOIN funcionarios f ON m.id_tb_funcionario = f.id_tb_funcionario
-            JOIN usuarios u ON f.id_tb_usuario = u.id_tb_usuario
-            WHERE m.crm = ?
-            """;
+                SELECT u.id_tb_usuario, f.id_tb_funcionario
+                FROM medicos m
+                JOIN funcionarios f ON m.id_tb_funcionario = f.id_tb_funcionario
+                JOIN usuarios u ON f.id_tb_usuario = u.id_tb_usuario
+                WHERE m.crm = ?
+                """;
 
         Connection conn = null;
 
@@ -272,8 +275,8 @@ public class Medico extends Funcionario {
                 "JOIN medicos m ON m.id_tb_funcionario = f.id_tb_funcionario";
 
         try (Connection conn = ConexaoDB.obterConexao();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Medico medico = new Medico(
@@ -317,7 +320,7 @@ public class Medico extends Funcionario {
                 "WHERE m.area_de_atuacao = ?";
 
         try (Connection conn = ConexaoDB.obterConexao();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, areaDeAtuacao);
 

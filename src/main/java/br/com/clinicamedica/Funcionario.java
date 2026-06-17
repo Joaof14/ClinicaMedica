@@ -19,7 +19,7 @@ public class Funcionario extends Usuario {
     private static final double SALARIO_MAXIMO = 5000.00;
     private static final int CARGA_HORARIA_MINIMA = 20;
     private static final int CARGA_HORARIA_MAXIMA = 44;
-    private static final Set<String> TURNOS_VALIDOS = Set.of("manhã", "tarde", "noite");
+    private static final Set<String> TURNOS_VALIDOS = Set.of("manhã", "tarde", "noite", "integral");
 
     public Funcionario(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
             boolean ativo, double salario, int cargaHorariaSemanal, String turno, boolean atendente) {
@@ -32,16 +32,20 @@ public class Funcionario extends Usuario {
 
     private static void validarSalario(double salario) {
         if (salario < SALARIO_MINIMO)
-            throw new IllegalArgumentException(String.format("O salario nao pode ser inferior ao salario minimo: R$ %.2f.", SALARIO_MINIMO));
+            throw new IllegalArgumentException(
+                    String.format("O salario nao pode ser inferior ao salario minimo: R$ %.2f.", SALARIO_MINIMO));
         if (salario > SALARIO_MAXIMO)
-            throw new IllegalArgumentException(String.format("O salario nao pode ser superior ao salario maximo: R$ %.2f.", SALARIO_MAXIMO));
+            throw new IllegalArgumentException(
+                    String.format("O salario nao pode ser superior ao salario maximo: R$ %.2f.", SALARIO_MAXIMO));
     }
 
     private static void validarCargaHoraria(int cargaHoraria) {
         if (cargaHoraria < CARGA_HORARIA_MINIMA)
-            throw new IllegalArgumentException(String.format("A carga horaria semanal nao pode ser inferior a %d horas.", CARGA_HORARIA_MINIMA));
+            throw new IllegalArgumentException(
+                    String.format("A carga horaria semanal nao pode ser inferior a %d horas.", CARGA_HORARIA_MINIMA));
         if (cargaHoraria > CARGA_HORARIA_MAXIMA)
-            throw new IllegalArgumentException(String.format("A carga horaria semanal nao pode ser superior a %d horas.", CARGA_HORARIA_MAXIMA));
+            throw new IllegalArgumentException(
+                    String.format("A carga horaria semanal nao pode ser superior a %d horas.", CARGA_HORARIA_MAXIMA));
     }
 
     private static void validarTurno(String turno) {
@@ -95,7 +99,8 @@ public class Funcionario extends Usuario {
             }
 
             conn.commit();
-            return new Funcionario(nome, idade, sexo, cpf, telefone, login, senha, ativo, salario, cargaHorariaSemanal, turno, atendente);
+            return new Funcionario(nome, idade, sexo, cpf, telefone, login, senha, ativo, salario, cargaHorariaSemanal,
+                    turno, atendente);
         } catch (SQLException e) {
             if (conn != null) {
                 try {
@@ -123,12 +128,15 @@ public class Funcionario extends Usuario {
         System.out.println("=========================");
     }
 
-    public static boolean atualizarFuncionario(String cpf, double novoSalario, int novaCargaHoraria, String novoTurno, boolean novoAtendente) {
+    public static boolean atualizarFuncionario(String cpf, double novoSalario, int novaCargaHoraria, String novoTurno,
+            boolean novoAtendente) {
         validarCampos(novoSalario, novaCargaHoraria, novoTurno);
-        String sql = "UPDATE funcionarios f JOIN usuarios u ON f.id_tb_usuario = u.id_tb_usuario SET f.salario = ?, f.carga_horaria_semanal = ?, f.turno = ?, f.atendente = ? WHERE u.cpf = ?";
+        String sql = "UPDATE funcionarios SET salario = ?, carga_horaria_semanal = ?, turno = ?, atendente = ? " +
+                "FROM usuarios u " +
+                "WHERE funcionarios.id_tb_usuario = u.id_tb_usuario AND u.cpf = ?";
 
         try (Connection conn = ConexaoDB.obterConexao();
-        PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setDouble(1, novoSalario);
             stmt.setInt(2, novaCargaHoraria);
             stmt.setString(3, novoTurno);
@@ -140,10 +148,10 @@ public class Funcionario extends Usuario {
                 return false;
             }
             return true;
-            } catch (SQLException e) {
-                System.out.println("Erro ao atualizar funcionario: " + e.getMessage());
-                return false;
-            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao atualizar funcionario: " + e.getMessage());
+            return false;
+        }
     }
 
     public static boolean deletarFuncionario(String cpf) {
@@ -193,12 +201,11 @@ public class Funcionario extends Usuario {
                         } catch (SQLException ex) {
                             System.out.println("Erro ao fechar conexao: " + ex.getMessage());
                         }
-                    }
-                System.out.println("Erro ao deletar funcionario: " + e.getMessage());
-                return false;
+                }
+            System.out.println("Erro ao deletar funcionario: " + e.getMessage());
+            return false;
         }
     }
-    
 
     public static List<Funcionario> listarFuncionario() {
         List<Funcionario> funcionarios = new ArrayList<>();
