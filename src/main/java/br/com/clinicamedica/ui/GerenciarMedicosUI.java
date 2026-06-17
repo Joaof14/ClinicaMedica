@@ -42,12 +42,43 @@ public class GerenciarMedicosUI {
     private static void atualizarMedico() {
         Utils.limparTela();
         System.out.println("=== ATUALIZAR MÉDICO ===");
-        utils.pausar();
+
+        try {
+            String crmAtual = Utils.lerTexto("CRM atual do médico: ");
+            String novaArea = Utils.lerTexto("Nova área de atuação: ");
+            String novoCrm = Utils.lerTexto("Novo CRM: ");
+
+            boolean atualizado = Medico.atualizarMedico(crmAtual, novaArea, novoCrm);
+
+            if (atualizado) {
+                System.out.println("Médico atualizado com sucesso.");
+            } else {
+                System.out.println("Médico não encontrado.");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao atualizar médico: " + e.getMessage());
+        }
+
+        Utils.pausar();
     }
 
     private static void removerMedico() {
         Utils.limparTela();
         System.out.println("=== REMOVER MÉDICO ===");
+
+        try {
+            String crm = Utils.lerTexto("CRM do médico: ");
+            boolean removido = Medico.deletarMedico(crm);
+
+            if (removido) {
+                System.out.println("Médico removido com sucesso.");
+            } else {
+                System.out.println("Médico não encontrado.");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao remover médico: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
