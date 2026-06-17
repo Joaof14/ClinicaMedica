@@ -4,17 +4,17 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Paciente extends Usuario{
+public class Paciente extends Usuario {
     private float peso;
     private float altura;
     private String sintomas;
-    
+
     private static List<Paciente> pacientes = new ArrayList<>();
 
-    
     public Paciente(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
             boolean ativo, float peso, float altura, String sintomas) {
         super(nome, idade, sexo, cpf, telefone, login, senha, ativo);
@@ -23,60 +23,59 @@ public class Paciente extends Usuario{
         this.sintomas = sintomas;
     }
 
-    public void verPaciente(){
+    public void verPaciente() {
         System.out.println("Imprimindo Paciente:\n");
         System.out.println("==========================");
         System.out.println(this.toString());
         System.out.println("=========================");
     }
 
-    public static Paciente cadastrarPaciente(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
+    public static Paciente cadastrarPaciente(String nome, int idade, String sexo, String cpf, String telefone,
+            String login, String senha,
             boolean ativo, float peso, float altura, String sintomas) {
-                Connection conn = null;
+        Connection conn = null;
+
         try {
             conn = ConexaoDB.obterConexao();
             conn.setAutoCommit(false);
 
             String sqlUsuario = "INSERT INTO usuarios (nome, idade, sexo, cpf, telefone, login, senha, ativo) " +
-                               "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            
-            PreparedStatement stmtUsuario = conn.prepareStatement(sqlUsuario);
-            stmtUsuario.setString(1, nome);
-            stmtUsuario.setInt(2, idade);
-            stmtUsuario.setString(3, sexo);
-            stmtUsuario.setString(4, cpf);
-            stmtUsuario.setString(5, telefone);
-            stmtUsuario.setString(6, login);
-            stmtUsuario.setString(7, senha);
-            stmtUsuario.setBoolean(8, ativo);
-            stmtUsuario.executeUpdate();
-            stmtUsuario.close();
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-            String sqlBuscarId = "SELECT id_tb_usuario FROM usuarios WHERE cpf = ?";
-            PreparedStatement stmtBuscar = conn.prepareStatement(sqlBuscarId);
-            stmtBuscar.setString(1, cpf);
-            ResultSet rs = stmtBuscar.executeQuery();
-            if (!rs.next()) {
-                throw new SQLException("Usuário inserido, mas ID não encontrado para o CPF: " + cpf);
+            int idUsuario;
+            try (PreparedStatement stmtUsuario = conn.prepareStatement(sqlUsuario,
+                    java.sql.Statement.RETURN_GENERATED_KEYS)) {
+                stmtUsuario.setString(1, nome);
+                stmtUsuario.setInt(2, idade);
+                stmtUsuario.setString(3, sexo);
+                stmtUsuario.setString(4, cpf);
+                stmtUsuario.setString(5, telefone);
+                stmtUsuario.setString(6, login);
+                stmtUsuario.setString(7, senha);
+                stmtUsuario.setBoolean(8, ativo);
+                stmtUsuario.executeUpdate();
+
+                try (ResultSet rs = stmtUsuario.getGeneratedKeys()) {
+                    if (!rs.next()) {
+                        throw new SQLException("Falha ao obter ID do usuário gerado.");
+                    }
+                    idUsuario = rs.getInt(1);
+                }
             }
-            int idUsuario = rs.getInt(1);
-            rs.close();
-            stmtBuscar.close();
-
             String sqlPaciente = "INSERT INTO pacientes (id_tb_usuario, peso, altura, sintomas) " +
-                                "VALUES (?, ?, ?, ?)";
-            
-            PreparedStatement stmtPaciente = conn.prepareStatement(sqlPaciente);
-            stmtPaciente.setInt(1, idUsuario);
-            stmtPaciente.setFloat(2, peso);
-            stmtPaciente.setFloat(3, altura);
-            stmtPaciente.setString(4, sintomas);
-            stmtPaciente.executeUpdate();
-            stmtPaciente.close();
+                    "VALUES (?, ?, ?, ?)";
 
+            try (PreparedStatement stmtPaciente = conn.prepareStatement(sqlPaciente)) {
+                stmtPaciente.setInt(1, idUsuario);
+                stmtPaciente.setFloat(2, peso);
+                stmtPaciente.setFloat(3, altura);
+                stmtPaciente.setString(4, sintomas);
+                stmtPaciente.executeUpdate();
+            }
             conn.commit();
 
-            Paciente paciente = new Paciente(nome, idade, sexo, cpf, telefone, login, senha, ativo, peso, altura,  sintomas);
+            Paciente paciente = new Paciente(nome, idade, sexo, cpf, telefone, login, senha, ativo, peso, altura,
+                    sintomas);
             System.out.println("Paciente cadastrado com sucesso! CPF: " + cpf);
             return paciente;
 
@@ -102,39 +101,40 @@ public class Paciente extends Usuario{
         }
     }
 
-    public void atualizarPaciente(Paciente paciente, String nome, int idade, String sexo, String cpf, String telefone, String login, String senha, boolean ativo, float altura, float peso, String sintomas){
-                String sqlUsuario = "UPDATE usuarios SET nome = ?, idade = ?, sexo = ?, cpf = ?, " +
-                           "telefone = ?, login = ?, senha = ?, ativo = ? WHERE cpf = ?";
-        
+    public void atualizarPaciente(Paciente paciente, String nome, int idade, String sexo, String cpf, String telefone,
+            String login, String senha, boolean ativo, float altura, float peso, String sintomas) {
+        String sqlUsuario = "UPDATE usuarios SET nome = ?, idade = ?, sexo = ?, cpf = ?, " +
+                "telefone = ?, login = ?, senha = ?, ativo = ? WHERE cpf = ?";
+
         String sqlAtualizarPaciente = "UPDATE pacientes SET peso = ?, altura = ?, sintomas = ? " +
-                                     "WHERE id_tb_usuario = (SELECT id_tb_usuario FROM usuarios WHERE cpf = ?)";
+                "WHERE id_tb_usuario = (SELECT id_tb_usuario FROM usuarios WHERE cpf = ?)";
 
         Connection conn = null;
         try {
+
             conn = ConexaoDB.obterConexao();
             conn.setAutoCommit(false);
 
-            PreparedStatement stmtUsuario = conn.prepareStatement(sqlUsuario);
-            stmtUsuario.setString(1, nome);
-            stmtUsuario.setInt(2, idade);
-            stmtUsuario.setString(3, sexo);
-            stmtUsuario.setString(4, cpf);
-            stmtUsuario.setString(5, telefone);
-            stmtUsuario.setString(6, login);
-            stmtUsuario.setString(7, senha);
-            stmtUsuario.setBoolean(8, ativo);
-            stmtUsuario.setString(9, this.getCpf());
-            stmtUsuario.executeUpdate();
-            stmtUsuario.close();
+            try (PreparedStatement stmtUsuario = conn.prepareStatement(sqlUsuario)) {
+                stmtUsuario.setString(1, nome);
+                stmtUsuario.setInt(2, idade);
+                stmtUsuario.setString(3, sexo);
+                stmtUsuario.setString(4, cpf);
+                stmtUsuario.setString(5, telefone);
+                stmtUsuario.setString(6, login);
+                stmtUsuario.setString(7, senha);
+                stmtUsuario.setBoolean(8, ativo);
+                stmtUsuario.setString(9, this.getCpf());
+                stmtUsuario.executeUpdate();
+            }
 
-            PreparedStatement stmtPaciente = conn.prepareStatement(sqlAtualizarPaciente);
-            stmtPaciente.setFloat(1, peso);
-            stmtPaciente.setFloat(2, altura);
-            stmtPaciente.setString(3, sintomas);
-            stmtPaciente.setString(4, cpf); // usa o novo CPF, pois o UPDATE de usuarios já alterou o valor no banco
-            stmtPaciente.executeUpdate();
-            stmtPaciente.close();
-
+            try (PreparedStatement stmtPaciente = conn.prepareStatement(sqlAtualizarPaciente)) {
+                stmtPaciente.setFloat(1, peso);
+                stmtPaciente.setFloat(2, altura);
+                stmtPaciente.setString(3, sintomas);
+                stmtPaciente.setString(4, cpf);
+                stmtPaciente.executeUpdate();
+            }
             conn.commit();
 
             this.setNome(nome);
@@ -145,6 +145,7 @@ public class Paciente extends Usuario{
             this.setLogin(login);
             this.setSenha(senha);
             this.setAtivo(ativo);
+
             this.peso = peso;
             this.altura = altura;
             this.sintomas = sintomas;
@@ -172,26 +173,27 @@ public class Paciente extends Usuario{
         }
     }
 
-    public void deletarPaciente(Paciente paciente){
+    public void deletarPaciente(Paciente paciente) {
         Connection conn = null;
+
         try {
             conn = ConexaoDB.obterConexao();
             conn.setAutoCommit(false);
 
             String sqlPaciente = "DELETE FROM pacientes WHERE id_tb_usuario IN " +
-                                "(SELECT id_tb_usuario FROM usuarios WHERE cpf = ?)";
-            PreparedStatement stmtPaciente = conn.prepareStatement(sqlPaciente);
-            stmtPaciente.setString(1, this.getCpf());
-            stmtPaciente.executeUpdate();
-            stmtPaciente.close();
+                    "(SELECT id_tb_usuario FROM usuarios WHERE cpf = ?)";
 
+            try (PreparedStatement stmtPaciente = conn.prepareStatement(sqlPaciente)) {
+                stmtPaciente.setString(1, this.getCpf());
+                stmtPaciente.executeUpdate();
+            }
             String sqlUsuario = "DELETE FROM usuarios WHERE cpf = ?";
-            PreparedStatement stmtUsuario = conn.prepareStatement(sqlUsuario);
-            stmtUsuario.setString(1, this.getCpf());
-            stmtUsuario.executeUpdate();
-            stmtUsuario.close();
-
+            try (PreparedStatement stmtUsuario = conn.prepareStatement(sqlUsuario)) {
+                stmtUsuario.setString(1, this.getCpf());
+                stmtUsuario.executeUpdate();
+            }
             conn.commit();
+
             System.out.println("Paciente deletado com sucesso!");
 
         } catch (SQLException e) {
@@ -217,31 +219,30 @@ public class Paciente extends Usuario{
 
     public static List<Paciente> listarPacientes() {
         List<Paciente> pacientes = new ArrayList<>();
-        
+
         String sql = "SELECT u.nome, u.idade, u.sexo, u.cpf, u.telefone, " +
-                    "u.login, u.senha, u.ativo, p.peso, p.altura, p.sintomas " +
-                    "FROM usuarios u " +
-                    "JOIN pacientes p ON p.id_tb_usuario = u.id_tb_usuario " +
-                    "ORDER BY u.nome";
+                "u.login, u.senha, u.ativo, p.peso, p.altura, p.sintomas " +
+                "FROM usuarios u " +
+                "JOIN pacientes p ON p.id_tb_usuario = u.id_tb_usuario " +
+                "ORDER BY u.nome";
 
         try (Connection conn = ConexaoDB.obterConexao();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 Paciente paciente = new Paciente(
-                    rs.getString("nome"),
-                    rs.getInt("idade"),
-                    rs.getString("sexo"),
-                    rs.getString("cpf"),
-                    rs.getString("telefone"),
-                    rs.getString("login"),
-                    rs.getString("senha"),
-                    rs.getBoolean("ativo"),
-                    rs.getFloat("peso"),
-                    rs.getFloat("altura"),
-                    rs.getString("sintomas")  
-                );
+                        rs.getString("nome"),
+                        rs.getInt("idade"),
+                        rs.getString("sexo"),
+                        rs.getString("cpf"),
+                        rs.getString("telefone"),
+                        rs.getString("login"),
+                        rs.getString("senha"),
+                        rs.getBoolean("ativo"),
+                        rs.getFloat("peso"),
+                        rs.getFloat("altura"),
+                        rs.getString("sintomas"));
                 pacientes.add(paciente);
             }
 
@@ -254,33 +255,32 @@ public class Paciente extends Usuario{
 
     public static List<Paciente> listarPacientesPorSintomas(String sintomas) {
         List<Paciente> pacientes = new ArrayList<>();
-        
+
         String sql = "SELECT u.nome, u.idade, u.sexo, u.cpf, u.telefone, " +
-                    "u.login, u.senha, u.ativo, p.peso, p.altura, p.sintomas " +
-                    "FROM usuarios u " +
-                    "JOIN pacientes p ON p.id_tb_usuario = u.id_tb_usuario " +
-                    "WHERE p.sintomas ILIKE ?";
+                "u.login, u.senha, u.ativo, p.peso, p.altura, p.sintomas " +
+                "FROM usuarios u " +
+                "JOIN pacientes p ON p.id_tb_usuario = u.id_tb_usuario " +
+                "WHERE p.sintomas ILIKE ?";
 
         try (Connection conn = ConexaoDB.obterConexao();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, "%" + sintomas + "%");
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 Paciente paciente = new Paciente(
-                    rs.getString("nome"),
-                    rs.getInt("idade"),
-                    rs.getString("sexo"),
-                    rs.getString("cpf"),
-                    rs.getString("telefone"),
-                    rs.getString("login"),
-                    rs.getString("senha"),
-                    rs.getBoolean("ativo"),
-                    rs.getFloat("peso"),
-                    rs.getFloat("altura"),
-                    rs.getString("sintomas")
-                );
+                        rs.getString("nome"),
+                        rs.getInt("idade"),
+                        rs.getString("sexo"),
+                        rs.getString("cpf"),
+                        rs.getString("telefone"),
+                        rs.getString("login"),
+                        rs.getString("senha"),
+                        rs.getBoolean("ativo"),
+                        rs.getFloat("peso"),
+                        rs.getFloat("altura"),
+                        rs.getString("sintomas"));
                 pacientes.add(paciente);
             }
 

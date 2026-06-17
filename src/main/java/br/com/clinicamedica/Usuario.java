@@ -71,31 +71,31 @@ public abstract class Usuario {
 
         String cpfAntigo = usuario.getCpf();
 
-        usuario.setNome(nome);
-        usuario.setIdade(idade);
-        usuario.setSexo(sexo);
-        usuario.setCpf(cpf);
-        usuario.setTelefone(telefone);
-        usuario.setLogin(login);
-        usuario.setSenha(senha);
-        usuario.setAtivo(ativo);
-
         try (Connection conn = ConexaoDB.obterConexao(); PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, usuario.getNome());
-            stmt.setInt(2, usuario.getIdade());
-            stmt.setString(3, usuario.getSexo());
-            stmt.setString(4, usuario.getCpf());
-            stmt.setString(5, usuario.getTelefone());
-            stmt.setString(6, usuario.getLogin());
-            stmt.setString(7, usuario.getSenha());
-            stmt.setBoolean(8, usuario.isAtivo());
-
+            stmt.setString(1, nome);
+            stmt.setInt(2, idade);
+            stmt.setString(3, sexo);
+            stmt.setString(4, cpf);
+            stmt.setString(5, telefone);
+            stmt.setString(6, login);
+            stmt.setString(7, senha);
+            stmt.setBoolean(8, ativo);
             stmt.setString(9, cpfAntigo);
 
             int linhasAfetadas = stmt.executeUpdate();
 
             if (linhasAfetadas > 0) {
+
+                usuario.setNome(nome);
+                usuario.setIdade(idade);
+                usuario.setSexo(sexo);
+                usuario.setCpf(cpf);
+                usuario.setTelefone(telefone);
+                usuario.setLogin(login);
+                usuario.setSenha(senha);
+                usuario.setAtivo(ativo);
+
                 System.out.println("Atualização concluída com sucesso no banco de dados!");
             } else {
                 System.out.println("Aviso: Nenhum usuário encontrado com o CPF informado para atualizar.");
