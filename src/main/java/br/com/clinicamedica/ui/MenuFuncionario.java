@@ -57,59 +57,209 @@ public class MenuFuncionario {
 
     private static void cadastrarPaciente() {
         Utils.limparTela();
-        System.out.println("Função: cadastrarPaciente");
-        // TODO
+        System.out.println("=== CADASTRAR PACIENTE ===");
+
+        try {
+            String nome = Utils.lerTexto("Nome: ");
+            int idade = Utils.lerInteiro("Idade: ");
+            String sexo = Utils.lerTexto("Sexo: ");
+            String cpf = Utils.lerTexto("CPF: ");
+            String telefone = Utils.lerTexto("Telefone: ");
+            String login = Utils.lerTexto("Login: ");
+            String senha = Utils.lerTexto("Senha: ");
+            float peso = Float.parseFloat(Utils.lerTexto("Peso: "));
+            float altura = Float.parseFloat(Utils.lerTexto("Altura: "));
+            String sintomas = Utils.lerTexto("Sintomas: ");
+
+            Paciente paciente = Paciente.cadastrarPaciente(
+                nome, idade, sexo, cpf, telefone, login, senha,
+                true, peso, altura, sintomas
+            );
+
+            if (paciente != null) {
+                System.out.println("\nPaciente cadastrado com sucesso.");
+            } else {
+                System.out.println("\nNão foi possível cadastrar o paciente.");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao cadastrar paciente: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void atualizarPaciente() {
         Utils.limparTela();
-        System.out.println("Função: atualizarPaciente");
-        // TODO
+        System.out.println("=== ATUALIZAR PACIENTE ===");
+
+        try {
+            String cpfBusca = Utils.lerTexto("Informe o CPF do paciente: ");
+            Paciente paciente = buscarPacientePorCpf(cpfBusca);
+
+            if (paciente == null) {
+                System.out.println("Paciente não encontrado.");
+            } else {
+                String nome = Utils.lerTexto("Novo nome: ");
+                int idade = Utils.lerInteiro("Nova idade: ");
+                String sexo = Utils.lerTexto("Novo sexo: ");
+                String cpf = Utils.lerTexto("Novo CPF: ");
+                String telefone = Utils.lerTexto("Novo telefone: ");
+                String login = Utils.lerTexto("Novo login: ");
+                String senha = Utils.lerTexto("Nova senha: ");
+                float altura = Float.parseFloat(Utils.lerTexto("Nova altura: "));
+                float peso = Float.parseFloat(Utils.lerTexto("Novo peso: "));
+                String sintomas = Utils.lerTexto("Novos sintomas: ");
+
+                paciente.atualizarPaciente(
+                    paciente, nome, idade, sexo, cpf, telefone, login, senha,
+                    true, altura, peso, sintomas
+                );
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao atualizar paciente: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void removerPaciente() {
         Utils.limparTela();
-        System.out.println("Função: removerPaciente");
-        // TODO
+        System.out.println("=== REMOVER PACIENTE ===");
+
+        try {
+            String cpfBusca = Utils.lerTexto("Informe o CPF do paciente: ");
+            Paciente paciente = buscarPacientePorCpf(cpfBusca);
+
+            if (paciente == null) {
+                System.out.println("Paciente não encontrado.");
+            } else {
+                paciente.deletarPaciente(paciente);
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao remover paciente: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void listarPacientes() {
         Utils.limparTela();
-        System.out.println("Função: listarPacientes");
-        // TODO
+        System.out.println("=== LISTAR PACIENTES ===");
+
+        try {
+            List<Paciente> pacientes = Paciente.listarPacientes();
+
+            if (pacientes.isEmpty()) {
+                System.out.println("Nenhum paciente cadastrado.");
+            } else {
+                for (Paciente paciente : pacientes) {
+                    paciente.verPaciente();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao listar pacientes: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void listarPacientesPorSintomas() {
         Utils.limparTela();
-        System.out.println("Função: listarPacientesPorSintomas");
-        // TODO
+        System.out.println("=== LISTAR PACIENTES POR SINTOMAS ===");
+
+        try {
+            String sintomas = Utils.lerTexto("Informe o sintoma para busca: ");
+            List<Paciente> pacientes = Paciente.listarPacientesPorSintomas(sintomas);
+
+            if (pacientes.isEmpty()) {
+                System.out.println("Nenhum paciente encontrado com esse sintoma.");
+            } else {
+                for (Paciente paciente : pacientes) {
+                    paciente.verPaciente();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao listar pacientes por sintomas: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void gerarConsulta() {
         Utils.limparTela();
-        System.out.println("Função: gerarConsulta");
-        // TODO
+        System.out.println("=== GERAR CONSULTA ===");
+
+        try {
+            String dataTexto = Utils.lerTexto("Data da consulta (AAAA-MM-DD): ");
+            String horarioTexto = Utils.lerTexto("Horário da consulta (HH:MM): ");
+            String cpfPaciente = Utils.lerTexto("CPF do paciente: ");
+            String crmMedico = Utils.lerTexto("CRM do médico: ");
+
+            LocalDate data = LocalDate.parse(dataTexto);
+            LocalTime horario = LocalTime.parse(horarioTexto);
+
+            Consulta.gerarConsulta(data, horario, cpfPaciente, crmMedico);
+        } catch (Exception e) {
+            System.out.println("Erro ao gerar consulta: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void atualizarConsulta() {
         Utils.limparTela();
-        System.out.println("Função: atualizarConsulta");
-        // TODO
+        System.out.println("=== ATUALIZAR CONSULTA ===");
+
+        try {
+            int idConsulta = Utils.lerInteiro("Informe o ID da consulta: ");
+            Consulta consulta = buscarConsultaPorId(idConsulta);
+
+            if (consulta == null) {
+                System.out.println("Consulta não encontrada.");
+            } else {
+                String dataTexto = Utils.lerTexto("Nova data (AAAA-MM-DD): ");
+                String horarioTexto = Utils.lerTexto("Novo horário (HH:MM): ");
+                System.out.println("Status disponíveis: AGENDADA, EM_ANDAMENTO, CONCLUIDA, CANCELADA");
+                String statusTexto = Utils.lerTexto("Novo status: ").toUpperCase();
+                String prescricao = Utils.lerTexto("Prescrição (pode deixar vazio): ");
+
+                LocalDate data = LocalDate.parse(dataTexto);
+                LocalTime horario = LocalTime.parse(horarioTexto);
+                Status status = Status.valueOf(statusTexto);
+
+                if (prescricao.isBlank()) {
+                    prescricao = null;
+                }
+
+                consulta.atualizarConsulta(idConsulta, data, horario, status, prescricao);
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao atualizar consulta: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void cancelarConsulta() {
         Utils.limparTela();
-        System.out.println("Função: cancelarConsulta");
-        // TODO
+        System.out.println("=== CANCELAR CONSULTA ===");
+
+        try {
+            int idConsulta = Utils.lerInteiro("Informe o ID da consulta: ");
+            Consulta consulta = buscarConsultaPorId(idConsulta);
+
+            if (consulta == null) {
+                System.out.println("Consulta não encontrada.");
+            } else {
+                consulta.cancelarConsulta();
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao cancelar consulta: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
+        
 
     private static void listarConsultas() {
         Utils.limparTela();
@@ -230,7 +380,27 @@ public class MenuFuncionario {
         Utils.pausar();
     }
 
-    
+    private static Paciente buscarPacientePorCpf(String cpf) {
+        List<Paciente> pacientes = Paciente.listarPacientes();
 
-    
+        for (Paciente paciente : pacientes) {
+            if (paciente.getCpf().equals(cpf)) {
+                return paciente;
+            }
+        }
+
+        return null;
+    }
+
+    private static Consulta buscarConsultaPorId(int id) {
+        List<Consulta> consultas = Consulta.listarConsultas();
+
+        for (Consulta consulta : consultas) {
+            if (consulta.getId() == id) {
+                return consulta;
+            }
+        }
+
+        return null;
+    }
 }
