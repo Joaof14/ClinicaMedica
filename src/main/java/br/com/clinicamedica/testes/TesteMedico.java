@@ -9,35 +9,30 @@ import br.com.clinicamedica.Medico;
 
 public class TesteMedico {
     public static void main(String[] args) {
-        // Instancia Medico
 
-        // cadastrarMedico
+        Medico novoMedico = Medico.cadastrarMedico(
+                "Carlos Silva", 45, "Masculino", "11122233344", "84999990002",
+                "carlos.silva", "senha123", true, 15000.0, 40, "Diurno", false,
+                "UTI", "RN-1234");
 
-        // verMedico+toString
+        if (novoMedico != null) {
+            novoMedico.verMedico();
 
-        // atualizarMedico
+            Medico.atualizarMedico("RN-1234", "Ambulatorio", "RN-1234");
 
-        // deletarMedico
+            Medico.deletarMedico("RN-1234");
+        }
 
-        // listarMedico
-        
         System.out.println("Testando listar médico");
         List<Medico> l1 = listarMedicos();
-        //System.out.println(l1);
-        for (Medico m: l1){
+        for (Medico m : l1) {
             System.out.println(m);
         }
-        
 
-        
         System.out.println("Testando listar médico");
-        List<Medico> l2 = listarMedicosPorArea("Cardiologia");
-        for (Medico m: l2){
+        List<Medico> l2 = listarMedicosPorArea("UTI");
+        for (Medico m : l2) {
             System.out.println(m);
         }
-        
-
-        // teste set's
-
     }
 }
