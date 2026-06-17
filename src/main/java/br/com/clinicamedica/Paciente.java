@@ -36,7 +36,6 @@ public class Paciente extends Usuario{
             conn = ConexaoDB.obterConexao();
             conn.setAutoCommit(false);
 
-            // 1. Inserir na tabela usuarios
             String sqlUsuario = "INSERT INTO usuarios (nome, idade, sexo, cpf, telefone, login, senha, ativo) " +
                                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             
@@ -52,7 +51,6 @@ public class Paciente extends Usuario{
             stmtUsuario.executeUpdate();
             stmtUsuario.close();
 
-            // 2. Buscar o ID do usuário recém-criado
             String sqlBuscarId = "SELECT id_tb_usuario FROM usuarios WHERE cpf = ?";
             PreparedStatement stmtBuscar = conn.prepareStatement(sqlBuscarId);
             stmtBuscar.setString(1, cpf);
@@ -62,7 +60,6 @@ public class Paciente extends Usuario{
             rs.close();
             stmtBuscar.close();
 
-            // 3. Inserir na tabela pacientes
             String sqlPaciente = "INSERT INTO pacientes (id_tb_usuario, peso, altura, sintomas) " +
                                 "VALUES (?, ?, ?, ?)";
             
@@ -116,7 +113,6 @@ public class Paciente extends Usuario{
             conn = ConexaoDB.obterConexao();
             conn.setAutoCommit(false);
 
-            // Atualizar dados na tabela usuarios
             PreparedStatement stmtUsuario = conn.prepareStatement(sqlUsuario);
             stmtUsuario.setString(1, nome);
             stmtUsuario.setInt(2, idade);
@@ -130,7 +126,6 @@ public class Paciente extends Usuario{
             stmtUsuario.executeUpdate();
             stmtUsuario.close();
 
-            // Atualizar dados do paciente usando CPF
             PreparedStatement stmtPaciente = conn.prepareStatement(sqlAtualizarPaciente);
             stmtPaciente.setFloat(1, peso);
             stmtPaciente.setFloat(2, altura);
@@ -141,7 +136,6 @@ public class Paciente extends Usuario{
 
             conn.commit();
 
-            // Atualizar atributos do objeto
             this.setNome(nome);
             this.setIdade(idade);
             this.setSexo(sexo);
@@ -183,7 +177,6 @@ public class Paciente extends Usuario{
             conn = ConexaoDB.obterConexao();
             conn.setAutoCommit(false);
 
-            // Deletar da tabela pacientes (via JOIN com CPF)
             String sqlPaciente = "DELETE FROM pacientes WHERE id_tb_usuario IN " +
                                 "(SELECT id_tb_usuario FROM usuarios WHERE cpf = ?)";
             PreparedStatement stmtPaciente = conn.prepareStatement(sqlPaciente);
@@ -191,7 +184,6 @@ public class Paciente extends Usuario{
             stmtPaciente.executeUpdate();
             stmtPaciente.close();
 
-            // Deletar da tabela usuarios (ON DELETE CASCADE cuida do resto)
             String sqlUsuario = "DELETE FROM usuarios WHERE cpf = ?";
             PreparedStatement stmtUsuario = conn.prepareStatement(sqlUsuario);
             stmtUsuario.setString(1, this.getCpf());

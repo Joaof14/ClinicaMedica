@@ -19,10 +19,6 @@ public class Consulta {
     private String cpfPaciente;
     private String crmMedico;
 
-
-    
-
-
     public Consulta(int id, LocalDate data, LocalTime horario, StatusConsulta status, String prescricao,
             String cpfPaciente, String crmMedico) {
         this.id = id;
@@ -121,7 +117,6 @@ public class Consulta {
     public static List<Consulta> listarConsultas() {
         List<Consulta> consultas = new ArrayList<>();
 
-        // Faz JOIN para recuperar CPF e CRM, que são os dados usados no objeto Java
         String sql = """
                 SELECT c.id_tb_consulta, c.data_consulta, c.horario_consulta,
                        c.status, c.prescricao,

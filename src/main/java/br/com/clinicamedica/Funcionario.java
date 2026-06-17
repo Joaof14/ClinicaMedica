@@ -21,7 +21,6 @@ public class Funcionario extends Usuario {
     private static final int CARGA_HORARIA_MAXIMA = 44;
     private static final Set<String> TURNOS_VALIDOS = Set.of("manhã", "tarde", "noite");
 
-    // pode utilizar set's da classe para validações
     public Funcionario(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
             boolean ativo, double salario, int cargaHorariaSemanal, String turno, boolean atendente) {
         super(nome, idade, sexo, cpf, telefone, login, senha, ativo);
@@ -56,7 +55,6 @@ public class Funcionario extends Usuario {
         validarTurno(turno);
     }
 
-    // modificar a posteriori o retorno de void para Funcionario
     public static Funcionario cadastrarFuncionario(String nome, int idade, String sexo, String cpf, String telefone,
             String login, String senha, boolean ativo, double salario, int cargaHorariaSemanal, String turno,
             boolean atendente) {
@@ -165,7 +163,7 @@ public class Funcionario extends Usuario {
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (!rs.next()) {
                         conn.rollback();
-                        return false; // Não encontrou o usuário
+                        return false;
                     }
                     idUsuario = rs.getLong("id_tb_usuario");
                 }
@@ -203,21 +201,18 @@ public class Funcionario extends Usuario {
     
 
     public static List<Funcionario> listarFuncionario() {
-        // implementar
         List<Funcionario> funcionarios = new ArrayList<>();
 
-        // JOIN para trazer dados de usuarios + funcionarios
         String sql = "SELECT u.nome, u.idade, u.sexo, u.cpf, u.telefone, u.login, u.senha, u.ativo, " +
                 "f.salario, f.carga_horaria_semanal, f.turno, f.atendente " +
                 "FROM usuarios u " +
                 "JOIN funcionarios f ON f.id_tb_usuario = u.id_tb_usuario";
 
         try (Connection conn = ConexaoDB.obterConexao();
-                PreparedStatement stmt = conn.prepareStatement(sql); // modifica a query
-                ResultSet rs = stmt.executeQuery()) { // executa
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                // Campos comuns (reutilizados de Usuario)
                 Funcionario funcionario = new Funcionario(
                         rs.getString("nome"),
                         rs.getInt("idade"),
@@ -231,7 +226,6 @@ public class Funcionario extends Usuario {
                         rs.getInt("carga_horaria_semanal"),
                         rs.getString("turno"),
                         rs.getBoolean("atendente"));
-                // Adiciona na lista para depois retornar a lista
                 funcionarios.add(funcionario);
             }
 
@@ -259,14 +253,8 @@ public class Funcionario extends Usuario {
     }
 
     public static List<Funcionario> listarFuncionariosPorPapel(boolean atendente) {
-        // implementar
         List<Funcionario> funcionarios = new ArrayList<>();
 
-        /*
-         * Query para agrupar por papel, como não existe um campo no banco, o trabalho é
-         * feito na query
-         * Dessa forma permite adicionar mais funções posteriormente
-         */
         String sql = """
                 SELECT u.nome, u.idade, u.sexo, u.cpf, u.telefone, u.login, u.senha, u.ativo,
                        f.salario, f.carga_horaria_semanal, f.turno, f.atendente
@@ -283,8 +271,6 @@ public class Funcionario extends Usuario {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    // Campos comuns (reutilizados de Usuario)
-                    // Adiciona na lista para depois retornar a lista
                     funcionarios.add(mapearFuncionario(rs));
                 }
             }
@@ -301,7 +287,6 @@ public class Funcionario extends Usuario {
     }
 
     public void setSalario(double salario) {
-        // atualizar
         this.salario = salario;
     }
 
@@ -310,7 +295,6 @@ public class Funcionario extends Usuario {
     }
 
     public void setCargaHorariaSemanal(int cargaHorariaSemanal) {
-        // atualizar
         this.cargaHorariaSemanal = cargaHorariaSemanal;
     }
 
@@ -319,7 +303,6 @@ public class Funcionario extends Usuario {
     }
 
     public void setTurno(String turno) {
-        // atualizar
         this.turno = turno;
     }
 
@@ -328,11 +311,9 @@ public class Funcionario extends Usuario {
     }
 
     public void setAtendente(boolean atendente) {
-        // atualizar
         this.atendente = atendente;
     }
 
-    // Adequar para trazer o construtor da classe mãe
     @Override
     public String toString() {
 
