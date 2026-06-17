@@ -27,6 +27,21 @@ public class Utils {
             }
         }
     }
+    public static boolean lerBooleano(String mensagem) {
+        while (true) {
+            String entrada = lerTexto(mensagem).trim().toLowerCase();
+
+            if (entrada.equals("true") || entrada.equals("t") || entrada.equals("sim") || entrada.equals("s")) {
+                return true;
+            }
+
+            if (entrada.equals("false") || entrada.equals("f") || entrada.equals("nao") || entrada.equals("não") || entrada.equals("n")) {
+                return false;
+            }
+
+            System.out.println("Valor inválido. Digite sim/não ou true/false.");
+        }
+    }
 
     public static void pausar() {
         System.out.println("\nPressione ENTER para continuar...");
