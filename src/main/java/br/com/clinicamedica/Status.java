@@ -1,6 +1,6 @@
 package br.com.clinicamedica;
 
-public enum StatusConsulta {
+public enum Status {
     AGENDADA,
     EM_ANDAMENTO,
     CONCLUIDA,

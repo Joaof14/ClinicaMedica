@@ -49,8 +49,8 @@ select * from pacientes;
 
 -- 5. INSERINDO CONSULTAS 
 INSERT INTO consultas (id_consulta, id_tb_paciente, id_tb_medico, data_consulta, horario_consulta, status, prescricao) VALUES
-('CONS-001', 1, 1, '2026-06-05', '09:00:00', 'AGENDADA', NULL),
-('CONS-002', 2, 2, '2026-06-05', '14:30:00', 'AGENDADA', NULL),
-('CONS-003', 3, 3, '2026-05-30', '10:00:00', 'CONCLUIDA', 'Ibuprofeno 600mg de 8 em 8 horas e repouso.'),
-('CONS-004', 4, 4, '2026-05-31', '08:15:00', 'EM ANDAMENTO', NULL),
-('CONS-005', 5, 5, '2026-06-10', '16:00:00', 'CANCELADA', 'Paciente informou incompatibilidade de horário.');
+('CONS-001', 1, 6, '2026-06-05', '09:00:00', 'AGENDADA', NULL),
+('CONS-002', 2, 7, '2026-06-05', '14:30:00', 'AGENDADA', NULL),
+('CONS-003', 3, 8, '2026-05-30', '10:00:00', 'CONCLUIDA', 'Ibuprofeno 600mg de 8 em 8 horas e repouso.'),
+('CONS-004', 4, 9, '2026-05-31', '08:15:00', 'EM ANDAMENTO', NULL),
+('CONS-005', 5, 10, '2026-06-10', '16:00:00', 'CANCELADA', 'Paciente informou incompatibilidade de horário.');
