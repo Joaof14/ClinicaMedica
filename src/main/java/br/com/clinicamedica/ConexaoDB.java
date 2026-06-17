@@ -18,6 +18,9 @@ public class ConexaoDB {
                 .getClassLoader()
                 .getResourceAsStream("db.properties")) {
 
+            if (input == null) {
+                throw new RuntimeException("Arquivo 'db.properties' não encontrado no classpath!");
+            }
             Properties prop = new Properties();
             prop.load(input);
 

@@ -374,6 +374,7 @@ public class Medico extends Funcionario {
     @Override
     public String toString() {
         return String.format(
+                "MÉDICO\n" +
                 super.toString() +
                         "Área de atuação: %s%n" +
                         "CRM: %s%n",

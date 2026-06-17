@@ -107,17 +107,19 @@ public class Funcionario extends Usuario {
                     conn.rollback();
                 } catch (SQLException ex) {
                     System.out.println("Erro ao realizar rollback: " + ex.getMessage());
-                } finally {
-                    try {
-                        conn.setAutoCommit(true);
-                        conn.close();
-                    } catch (SQLException ex) {
-                        System.out.println("Erro ao fechar conexao: " + ex.getMessage());
-                    }
                 }
             }
             System.out.println("Erro ao cadastrar funcionario: " + e.getMessage());
             return null;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ex) {
+                    System.out.println("Erro ao fechar conexao: " + ex.getMessage());
+                }
+            }
         }
     }
 
@@ -132,8 +134,7 @@ public class Funcionario extends Usuario {
             boolean novoAtendente) {
         validarCampos(novoSalario, novaCargaHoraria, novoTurno);
         String sql = "UPDATE funcionarios SET salario = ?, carga_horaria_semanal = ?, turno = ?, atendente = ? " +
-                "FROM usuarios u " +
-                "WHERE funcionarios.id_tb_usuario = u.id_tb_usuario AND u.cpf = ?";
+                "WHERE id_tb_usuario = (SELECT id_tb_usuario FROM usuarios WHERE cpf = ?)";
 
         try (Connection conn = ConexaoDB.obterConexao();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -187,23 +188,24 @@ public class Funcionario extends Usuario {
             conn.commit();
             return true;
         } catch (SQLException e) {
-            if (conn != null)
+            if (conn != null) {
                 try {
                     conn.rollback();
                 } catch (SQLException ex) {
-                    System.out.println("Erro ao deletar funcionario: " + ex.getMessage());
-                    return false;
-                } finally {
-                    if (conn != null)
-                        try {
-                            conn.setAutoCommit(true);
-                            conn.close();
-                        } catch (SQLException ex) {
-                            System.out.println("Erro ao fechar conexao: " + ex.getMessage());
-                        }
+                    System.out.println("Erro ao realizar rollback: " + ex.getMessage());
                 }
+            }
             System.out.println("Erro ao deletar funcionario: " + e.getMessage());
             return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ex) {
+                    System.out.println("Erro ao fechar conexao: " + ex.getMessage());
+                }
+            }
         }
     }
 

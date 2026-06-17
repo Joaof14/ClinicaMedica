@@ -193,8 +193,8 @@ public class Consulta {
         }
 
         LocalDateTime dataHoraConsulta = LocalDateTime.of(this.data, this.horario);
-        if (dataHoraConsulta.isBefore(LocalDateTime.now())) {
-            System.out.println("A data/hora da consulta já passou. Não é possível iniciar.");
+        if (dataHoraConsulta.isAfter(LocalDateTime.now())) {
+            System.out.println("Ainda não é hora de iniciar esta consulta. Horário agendado: " + dataHoraConsulta);
             return;
         }
 

@@ -56,7 +56,9 @@ public class Paciente extends Usuario{
             PreparedStatement stmtBuscar = conn.prepareStatement(sqlBuscarId);
             stmtBuscar.setString(1, cpf);
             ResultSet rs = stmtBuscar.executeQuery();
-            rs.next();
+            if (!rs.next()) {
+                throw new SQLException("Usuário inserido, mas ID não encontrado para o CPF: " + cpf);
+            }
             int idUsuario = rs.getInt(1);
             rs.close();
             stmtBuscar.close();
@@ -105,9 +107,7 @@ public class Paciente extends Usuario{
                            "telefone = ?, login = ?, senha = ?, ativo = ? WHERE cpf = ?";
         
         String sqlAtualizarPaciente = "UPDATE pacientes SET peso = ?, altura = ?, sintomas = ? " +
-                                     "FROM usuarios u " +
-                                     "WHERE pacientes.id_tb_usuario = u.id_tb_usuario " +
-                                     "AND u.cpf = ?";
+                                     "WHERE id_tb_usuario = (SELECT id_tb_usuario FROM usuarios WHERE cpf = ?)";
 
         Connection conn = null;
         try {
@@ -131,7 +131,7 @@ public class Paciente extends Usuario{
             stmtPaciente.setFloat(1, peso);
             stmtPaciente.setFloat(2, altura);
             stmtPaciente.setString(3, sintomas);
-            stmtPaciente.setString(4, this.getCpf());
+            stmtPaciente.setString(4, cpf); // usa o novo CPF, pois o UPDATE de usuarios já alterou o valor no banco
             stmtPaciente.executeUpdate();
             stmtPaciente.close();
 
@@ -318,11 +318,11 @@ public class Paciente extends Usuario{
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Paciente{");
-        sb.append("peso=").append(peso);
-        sb.append(", altura=").append(altura);
-        sb.append(", sintomas=").append(sintomas);
-        sb.append('}');
+        sb.append("PACIENTE\n");
+        sb.append(super.toString());
+        sb.append("\npeso=").append(peso);
+        sb.append("\naltura=").append(altura);
+        sb.append("\nsintomas=").append(sintomas);
         return sb.toString();
     }
 }
