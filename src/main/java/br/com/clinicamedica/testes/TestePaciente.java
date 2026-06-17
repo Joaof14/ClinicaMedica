@@ -6,9 +6,8 @@ import br.com.clinicamedica.Paciente;
 
 public class TestePaciente {
     public static void main(String[] args) {
-        
-        // Teste de cadastro
-        System.out.println("=== TESTE CADASTRO ===");
+
+        System.out.println("TESTE CADASTRO");
         Paciente novoPaciente = Paciente.cadastrarPaciente(
             "Maria Santos", 30, "Feminino", "12345678901", 
             "84999990000", "maria.santos", "senha456", true,

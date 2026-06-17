@@ -106,7 +106,6 @@ public class Consulta {
                 int linhasAfetadas = stmtInsert.executeUpdate();
                 if (linhasAfetadas > 0) {
                     System.out.println("Consulta gerada com sucesso! ID: " + idConsulta);
-                    // Buscar o ID gerado para retornar a consulta
                     String sqlBuscar = "SELECT id_tb_consulta FROM consultas WHERE id_consulta = ?";
                     try (PreparedStatement stmtBuscar = conn.prepareStatement(sqlBuscar)) {
                         stmtBuscar.setString(1, idConsulta);
@@ -136,7 +135,6 @@ public class Consulta {
     }
 
     public void atualizarConsulta(int id, LocalDate data, LocalTime horario, Status status, String prescricao) {
-        // Validar se a consulta existe no banco
         String sqlCheck = "SELECT status FROM consultas WHERE id_tb_consulta = ?";
         String sqlUpdate = """
                 UPDATE consultas 
@@ -145,7 +143,6 @@ public class Consulta {
                 """;
         
         try (Connection conn = ConexaoDB.obterConexao()) {
-            // Verificar se a consulta existe e obter status atual
             Status statusAtual = null;
             try (PreparedStatement stmtCheck = conn.prepareStatement(sqlCheck)) {
                 stmtCheck.setInt(1, id);
@@ -157,16 +154,14 @@ public class Consulta {
                     statusAtual = Status.valueOf(rs.getString("status").replace(" ", "_"));
                 }
             }
-            
-            // Validar se a transição de status é permitida (apenas se o status for diferente)
+
             if (status != null && status != statusAtual) {
                 if (!validarTransicaoStatus(statusAtual, status)) {
                     System.out.println("Transição de status inválida: " + statusAtual + " -> " + status);
                     return;
                 }
             }
-            
-            // Atualizar a consulta no banco
+
             try (PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
                 stmtUpdate.setDate(1, Date.valueOf(data));
                 stmtUpdate.setTime(2, Time.valueOf(horario));
@@ -176,7 +171,6 @@ public class Consulta {
                 
                 int linhasAfetadas = stmtUpdate.executeUpdate();
                 if (linhasAfetadas > 0) {
-                    // Atualizar o objeto consulta
                     this.id = id;
                     this.data = data;
                     this.horario = horario;
@@ -193,20 +187,17 @@ public class Consulta {
     }
 
     public void iniciarConsulta() {
-        // Verificar se a consulta está no status AGENDADA
         if (this.status != Status.AGENDADA) {
             System.out.println("Não é possível iniciar uma consulta que não está AGENDADA. Status atual: " + this.status);
             return;
         }
-        
-        // Verificar se a data/hora da consulta já passou
+
         LocalDateTime dataHoraConsulta = LocalDateTime.of(this.data, this.horario);
         if (dataHoraConsulta.isBefore(LocalDateTime.now())) {
             System.out.println("A data/hora da consulta já passou. Não é possível iniciar.");
             return;
         }
-        
-        // Atualizar status no banco
+
         boolean atualizado = atualizarStatus(this.id, Status.EM_ANDAMENTO, null);
         if (atualizado) {
             this.status = Status.EM_ANDAMENTO;
@@ -218,14 +209,12 @@ public class Consulta {
         if (prescricao == null || prescricao.isBlank()) {
             throw new IllegalArgumentException("Prescrição não pode ser vazia ao concluir consulta");
         }
-        
-        // Verificar se a consulta está em andamento
+
         if (this.status != Status.EM_ANDAMENTO) {
             System.out.println("Não é possível concluir uma consulta que não está EM_ANDAMENTO. Status atual: " + this.status);
             return;
         }
-        
-        // Atualizar status e prescrição no banco
+
         boolean atualizado = atualizarStatus(this.id, Status.CONCLUIDA, prescricao);
         if (atualizado) {
             this.status = Status.CONCLUIDA;
@@ -235,7 +224,6 @@ public class Consulta {
     }
 
     public void cancelarConsulta() {
-        // Verificar se a consulta pode ser cancelada (AGENDADA ou EM_ANDAMENTO)
         if (this.status == Status.CONCLUIDA) {
             System.out.println("Não é possível cancelar uma consulta já concluída.");
             return;
@@ -245,8 +233,7 @@ public class Consulta {
             System.out.println("Esta consulta já está cancelada.");
             return;
         }
-        
-        // Atualizar status no banco
+
         boolean atualizado = atualizarStatus(this.id, Status.CANCELADA, null);
         if (atualizado) {
             this.status = Status.CANCELADA;
@@ -259,8 +246,7 @@ public class Consulta {
             System.out.println("Erro: A consulta fornecida é nula");
             return;
         }
-        
-        // Verificar se a consulta pode ser deletada (apenas AGENDADA ou CANCELADA)
+
         if (consulta.getStatus() == Status.EM_ANDAMENTO) {
             System.out.println("Não é possível deletar uma consulta em andamento. Cancela-la primeiro.");
             return;

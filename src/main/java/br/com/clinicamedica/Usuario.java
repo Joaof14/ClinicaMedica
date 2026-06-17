@@ -67,19 +67,12 @@ public abstract class Usuario {
         System.out.println("=========================");
     }
 
-    /*
-     * implementação para atualizar um usuário
-     * Recebe um objeto usuário e os parâmetros a serem atualizados
-     * utiliza set's para validar os valores
-     * atualiza no banco
-     */
     public static void atualizarUsuario(Usuario usuario, String nome, int idade, String sexo, String cpf,
             String telefone, String login, String senha, boolean ativo) {
         String query = "UPDATE usuarios SET nome = ?, idade = ?, sexo = ?, cpf = ?, telefone = ?, login = ?, senha = ?, ativo = ? WHERE cpf = ?";
 
-        String cpfAntigo = usuario.getCpf(); // Como a UML não é um DAO, vamos usar o cpf como atributo identificador
+        String cpfAntigo = usuario.getCpf();
 
-        // Uso implementação set's para validação
         usuario.setNome(nome);
         usuario.setIdade(idade);
         usuario.setSexo(sexo);
@@ -116,8 +109,6 @@ public abstract class Usuario {
     }
 
     public static void deletarUsuario(Usuario usuario) {
-        // busco usuario no banco de dados, se existir, deleto
-
         if (usuario == null) {
             System.out.println("Erro: O objeto usuário fornecido é nulo");
             return;
@@ -131,8 +122,6 @@ public abstract class Usuario {
             int linhasAfetadas = stmt.executeUpdate();
 
             if (linhasAfetadas > 0) {
-                // Banco implementado com ON DELETE CASCADE o que garante apagar registros
-                // atrelados
                 System.out.println("Usuário de CPF: " + usuario.getCpf()
                         + " e todas as suas dependências foram deletados com sucesso!");
             } else {
@@ -165,7 +154,6 @@ public abstract class Usuario {
     /* Implementação para listar todos os usuários */
     public static List<Usuario> listarUsuarios() {
         List<Usuario> todosUsuarios = new ArrayList<>();
-        // TODO: implementar listarPaciente e descomentar
         List<Paciente> pacientes = Paciente.listarPacientes();
         List<Funcionario> funcionarios = Funcionario.listarFuncionario();
 

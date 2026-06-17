@@ -20,13 +20,12 @@ public class TesteFuncionario {
 
         // deletarFuncionario
 
-        // listarFuncionario
-        // System.out.println("Teste de listar funcionário:");
-        // List<Funcionario> l1 = listarFuncionario();
-        // System.out.println(l1);
+        System.out.println("Teste de listar funcionário:");
+        List<Funcionario> l1 = listarFuncionario();
+        System.out.println(l1);
 
-        // System.out.println(" ");
-        // listarFuncionariosPorPapel
+        System.out.println(" ");
+
         System.out.println("Teste de listar por papel = true = atendente");
         List<Funcionario> l2 = listarFuncionariosPorPapel(true);
         System.out.println(l2);

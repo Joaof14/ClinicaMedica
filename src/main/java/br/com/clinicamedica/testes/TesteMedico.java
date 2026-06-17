@@ -29,11 +29,9 @@ public class TesteMedico {
         }
         
 
-        // listarMedicosPorArea
         
         System.out.println("Testando listar médico");
         List<Medico> l2 = listarMedicosPorArea("Cardiologia");
-        //System.out.println(l1);
         for (Medico m: l2){
             System.out.println(m);
         }
