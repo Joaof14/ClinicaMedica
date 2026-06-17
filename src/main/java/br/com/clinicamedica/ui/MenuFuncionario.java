@@ -1,6 +1,13 @@
 package br.com.clinicamedica.ui;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import br.com.clinicamedica.Consulta;
 import br.com.clinicamedica.Funcionario;
+import br.com.clinicamedica.Paciente;
+import br.com.clinicamedica.Status;
 
 public class MenuFuncionario {
 
@@ -106,36 +113,124 @@ public class MenuFuncionario {
 
     private static void listarConsultas() {
         Utils.limparTela();
-        System.out.println("Função: listarConsultas");
-        // TODO
+        System.out.println("=== LISTAR CONSULTAS ===");
+
+        try {
+            List<Consulta> consultas = Consulta.listarConsultas();
+
+            if (consultas.isEmpty()) {
+                System.out.println("Nenhuma consulta cadastrada.");
+            } else {
+                for (Consulta consulta : consultas) {
+                    consulta.verConsulta();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao listar consultas: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void listarConsultasPorPaciente() {
         Utils.limparTela();
-        System.out.println("Função: listarConsultasPorPaciente");
-        // TODO
+        System.out.println("=== LISTAR CONSULTAS POR PACIENTE ===");
+
+        try {
+            String cpf = Utils.lerTexto("Informe o CPF do paciente: ");
+            List<Consulta> consultas = Consulta.listarConsultasPorPaciente(cpf);
+
+            if (consultas.isEmpty()) {
+                System.out.println("Nenhuma consulta encontrada para esse paciente.");
+            } else {
+                for (Consulta consulta : consultas) {
+                    consulta.verConsulta();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao listar consultas por paciente: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void listarConsultasPorMedico() {
         Utils.limparTela();
-        System.out.println("Função: listarConsultasPorMedico");
-        // TODO
+        System.out.println("=== LISTAR CONSULTAS POR MÉDICO ===");
+
+        try {
+            String crm = Utils.lerTexto("Informe o CRM do médico: ");
+            List<Consulta> consultas = Consulta.listarConsultasPorMedico(crm);
+
+            if (consultas.isEmpty()) {
+                System.out.println("Nenhuma consulta encontrada para esse médico.");
+            } else {
+                for (Consulta consulta : consultas) {
+                    consulta.verConsulta();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao listar consultas por médico: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void listarConsultasPorPeriodo() {
         Utils.limparTela();
-        System.out.println("Função: listarConsultasPorPeriodo");
-        // TODO
+        System.out.println("=== LISTAR CONSULTAS POR PERÍODO ===");
+
+        try {
+            String inicioTexto = Utils.lerTexto("Data inicial (AAAA-MM-DD): ");
+            String fimTexto = Utils.lerTexto("Data final (AAAA-MM-DD): ");
+
+            LocalDate inicio = LocalDate.parse(inicioTexto);
+            LocalDate fim = LocalDate.parse(fimTexto);
+
+            List<Consulta> consultas = Consulta.listarConsultasPorPeriodo(inicio, fim);
+
+            if (consultas.isEmpty()) {
+                System.out.println("Nenhuma consulta encontrada no período informado.");
+            } else {
+                for (Consulta consulta : consultas) {
+                    consulta.verConsulta();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao listar consultas por período: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void listarConsultasPorStatus() {
         Utils.limparTela();
-        System.out.println("Função: listarConsultasPorStatus");
-        // TODO
+        System.out.println("=== LISTAR CONSULTAS POR STATUS ===");
+
+        try {
+            System.out.println("Status disponíveis: AGENDADA, EM_ANDAMENTO, CONCLUIDA, CANCELADA");
+            String statusTexto = Utils.lerTexto("Informe o status: ").toUpperCase();
+
+            Status status = Status.valueOf(statusTexto);
+            List<Consulta> consultas = Consulta.listarConsultasPorStatus(status);
+
+            if (consultas.isEmpty()) {
+                System.out.println("Nenhuma consulta encontrada com esse status.");
+            } else {
+                for (Consulta consulta : consultas) {
+                    consulta.verConsulta();
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Status inválido. Use: AGENDADA, EM_ANDAMENTO, CONCLUIDA ou CANCELADA.");
+        } catch (Exception e) {
+            System.out.println("Erro ao listar consultas por status: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
+
+    
+
+    
 }
