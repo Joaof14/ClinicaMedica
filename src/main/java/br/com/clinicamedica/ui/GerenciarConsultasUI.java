@@ -29,7 +29,7 @@ public class GerenciarConsultasUI {
 
             switch (opcao) {
                 case 1 -> gerarConsulta();
-                case 2 -> atualizarConsulta();
+                case 2 -> atualizarConsulta(funcionarioLogado);
                 case 3-> cancelarConsulta();
                 case 4 -> listarConsultas();
                 case 5 -> listarConsultasPorPaciente();
@@ -49,13 +49,10 @@ public class GerenciarConsultasUI {
         System.out.println("=== GERAR CONSULTA ===");
 
         try {
-            String dataTexto = Utils.lerTexto("Data da consulta (AAAA-MM-DD): ");
-            String horarioTexto = Utils.lerTexto("Horário da consulta (HH:MM): ");
+            LocalDate data = Utils.lerData("Data da consulta (AAAA-MM-DD): ");
+            LocalTime horario = Utils.lerHorario("Horário da consulta (HH:MM): ");
             String cpfPaciente = Utils.lerTexto("CPF do paciente: ");
             String crmMedico = Utils.lerTexto("CRM do médico: ");
-
-            LocalDate data = LocalDate.parse(dataTexto);
-            LocalTime horario = LocalTime.parse(horarioTexto);
 
             Consulta.gerarConsulta(data, horario, cpfPaciente, crmMedico);
         } catch (Exception e) {
@@ -65,7 +62,7 @@ public class GerenciarConsultasUI {
         Utils.pausar();
     }
 
-    private static void atualizarConsulta() {
+    private static void atualizarConsulta(Funcionario funcionarioLogado) {
         Utils.limparTela();
         System.out.println("=== ATUALIZAR CONSULTA ===");
 
@@ -76,18 +73,23 @@ public class GerenciarConsultasUI {
             if (consulta == null) {
                 System.out.println("Consulta não encontrada.");
             } else {
-                String dataTexto = Utils.lerTexto("Nova data (AAAA-MM-DD): ");
-                String horarioTexto = Utils.lerTexto("Novo horário (HH:MM): ");
-                System.out.println("Status disponíveis: AGENDADA, EM_ANDAMENTO, CONCLUIDA, CANCELADA");
-                String statusTexto = Utils.lerTexto("Novo status: ").toUpperCase();
-                String prescricao = Utils.lerTexto("Prescrição (pode deixar vazio): ");
+                LocalDate data = Utils.lerData("Nova data (AAAA-MM-DD): ");
+                LocalTime horario = Utils.lerHorario("Novo horário (HH:MM): ");
+                
+                Status status = consulta.getStatus();
+                String prescricao = consulta.getPrescricao();
 
-                LocalDate data = LocalDate.parse(dataTexto);
-                LocalTime horario = LocalTime.parse(horarioTexto);
-                Status status = Status.valueOf(statusTexto);
-
-                if (prescricao.isBlank()) {
-                    prescricao = null;
+                if (funcionarioLogado instanceof br.com.clinicamedica.Medico) {
+                    System.out.println("Status disponíveis: AGENDADA, EM_ANDAMENTO, CONCLUIDA, CANCELADA");
+                    String statusTexto = Utils.lerTexto("Novo status: ").toUpperCase();
+                    status = Status.valueOf(statusTexto);
+                    prescricao = Utils.lerTexto("Prescrição (pode deixar vazio): ");
+                    
+                    if (prescricao.isBlank()) {
+                        prescricao = null;
+                    }
+                } else {
+                    System.out.println("Como atendente, você só pode alterar data e horário. Status e prescrição foram mantidos.");
                 }
 
                 consulta.atualizarConsulta(idConsulta, data, horario, status, prescricao);
@@ -190,11 +192,8 @@ public class GerenciarConsultasUI {
         System.out.println("=== LISTAR CONSULTAS POR PERÍODO ===");
 
         try {
-            String inicioTexto = Utils.lerTexto("Data inicial (AAAA-MM-DD): ");
-            String fimTexto = Utils.lerTexto("Data final (AAAA-MM-DD): ");
-
-            LocalDate inicio = LocalDate.parse(inicioTexto);
-            LocalDate fim = LocalDate.parse(fimTexto);
+            LocalDate inicio = Utils.lerData("Data inicial (AAAA-MM-DD): ");
+            LocalDate fim = Utils.lerData("Data final (AAAA-MM-DD): ");
 
             List<Consulta> consultas = Consulta.listarConsultasPorPeriodo(inicio, fim);
 

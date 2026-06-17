@@ -45,7 +45,7 @@ public class GerenciarMedicosUI {
             String telefone = Utils.lerTexto("Telefone: ");
             String login = Utils.lerTexto("Login: ");
             String senha = Utils.lerTexto("Senha: ");
-            double salario = Double.parseDouble(Utils.lerTexto("Salário: "));
+            double salario = Utils.lerDouble("Salário: ");
             int cargaHoraria = Utils.lerInteiro("Carga horária semanal: ");
             String turno = Utils.lerTexto("Turno: ");
             boolean atendente = Utils.lerBooleano("É atendente? (true/false): ");

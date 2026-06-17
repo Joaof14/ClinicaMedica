@@ -44,10 +44,10 @@ public class GerenciarFuncionariosUI {
             String telefone = Utils.lerTexto("Telefone: ");
             String login = Utils.lerTexto("Login: ");
             String senha = Utils.lerTexto("Senha: ");
-            double salario = Double.parseDouble(Utils.lerTexto("Salário: "));
+            double salario = Utils.lerDouble("Salário: ");
             int cargaHoraria = Utils.lerInteiro("Carga horária semanal: ");
-            String turno = Utils.lerTexto("Turno: ");
-            boolean atendente = Utils.lerBooleano("É atendente? (true/false): ");
+            String turno = Utils.lerTexto("Turno: (matutuino/vespertino) ");
+            boolean atendente = Utils.lerBooleano("É atendente? (sim/nao): ");
 
             Funcionario funcionario = Funcionario.cadastrarFuncionario(
                 nome, idade, sexo, cpf, telefone, login, senha,
@@ -72,10 +72,10 @@ public class GerenciarFuncionariosUI {
 
         try {
             String cpf = Utils.lerTexto("CPF do funcionário: ");
-            double salario = Double.parseDouble(Utils.lerTexto("Novo salário: "));
+            double salario = Utils.lerDouble("Novo salário: ");
             int cargaHoraria = Utils.lerInteiro("Nova carga horária semanal: ");
             String turno = Utils.lerTexto("Novo turno: ");
-            boolean atendente = Utils.lerBooleano("É atendente? (true/false): ");
+            boolean atendente = Utils.lerBooleano("É atendente? (sim/nao): ");
 
             boolean atualizado = Funcionario.atualizarFuncionario(
                 cpf, salario, cargaHoraria, turno, atendente

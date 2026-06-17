@@ -42,10 +42,53 @@ public class Utils {
             System.out.println("Valor inválido. Digite sim/não ou true/false.");
         }
     }
-
     public static void pausar() {
         System.out.println("\nPressione ENTER para continuar...");
         entrada.nextLine();
+    }
+
+    public static double lerDouble(String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                return Double.parseDouble(entrada.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida. Digite um número válido (ex: 1200.50).");
+            }
+        }
+    }
+
+    public static float lerFloat(String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                return Float.parseFloat(entrada.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada inválida. Digite um número válido (ex: 75.5).");
+            }
+        }
+    }
+
+    public static java.time.LocalDate lerData(String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                return java.time.LocalDate.parse(entrada.nextLine());
+            } catch (java.time.format.DateTimeParseException e) {
+                System.out.println("Formato de data inválido. Use AAAA-MM-DD.");
+            }
+        }
+    }
+
+    public static java.time.LocalTime lerHorario(String mensagem) {
+        while (true) {
+            try {
+                System.out.print(mensagem);
+                return java.time.LocalTime.parse(entrada.nextLine());
+            } catch (java.time.format.DateTimeParseException e) {
+                System.out.println("Formato de horário inválido. Use HH:MM.");
+            }
+        }
     }
 
     public static void msgOpcaoInvalida() {

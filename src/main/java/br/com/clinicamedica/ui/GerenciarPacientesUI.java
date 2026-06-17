@@ -46,8 +46,8 @@ public class GerenciarPacientesUI {
             String telefone = Utils.lerTexto("Telefone: ");
             String login = Utils.lerTexto("Login: ");
             String senha = Utils.lerTexto("Senha: ");
-            float peso = Float.parseFloat(Utils.lerTexto("Peso: "));
-            float altura = Float.parseFloat(Utils.lerTexto("Altura: "));
+            float peso = Utils.lerFloat("Peso: ");
+            float altura = Utils.lerFloat("Altura: ");
             String sintomas = Utils.lerTexto("Sintomas: ");
 
             Paciente paciente = Paciente.cadastrarPaciente(
@@ -85,8 +85,8 @@ public class GerenciarPacientesUI {
                 String telefone = Utils.lerTexto("Novo telefone: ");
                 String login = Utils.lerTexto("Novo login: ");
                 String senha = Utils.lerTexto("Nova senha: ");
-                float altura = Float.parseFloat(Utils.lerTexto("Nova altura: "));
-                float peso = Float.parseFloat(Utils.lerTexto("Novo peso: "));
+                float altura = Utils.lerFloat("Nova altura: ");
+                float peso = Utils.lerFloat("Novo peso: ");
                 String sintomas = Utils.lerTexto("Novos sintomas: ");
 
                 paciente.atualizarPaciente(
