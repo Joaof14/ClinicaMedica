@@ -35,17 +35,81 @@ public class GerenciarFuncionariosUI {
     private static void cadastrarFuncionario() {
         Utils.limparTela();
         System.out.println("=== CADASTRAR FUNCIONÁRIO ===");
+
+        try {
+            String nome = Utils.lerTexto("Nome: ");
+            int idade = Utils.lerInteiro("Idade: ");
+            String sexo = Utils.lerTexto("Sexo: ");
+            String cpf = Utils.lerTexto("CPF: ");
+            String telefone = Utils.lerTexto("Telefone: ");
+            String login = Utils.lerTexto("Login: ");
+            String senha = Utils.lerTexto("Senha: ");
+            double salario = Double.parseDouble(Utils.lerTexto("Salário: "));
+            int cargaHoraria = Utils.lerInteiro("Carga horária semanal: ");
+            String turno = Utils.lerTexto("Turno: ");
+            boolean atendente = Utils.lerBooleano("É atendente? (true/false): ");
+
+            Funcionario funcionario = Funcionario.cadastrarFuncionario(
+                nome, idade, sexo, cpf, telefone, login, senha,
+                true, salario, cargaHoraria, turno, atendente
+            );
+
+            if (funcionario != null) {
+                System.out.println("Funcionário cadastrado com sucesso.");
+            } else {
+                System.out.println("Não foi possível cadastrar o funcionário.");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao cadastrar funcionário: " + e.getMessage());
+        }
+
+        Utils.pausar();
     }
 
     private static void atualizarFuncionario() {
         Utils.limparTela();
         System.out.println("=== ATUALIZAR FUNCIONÁRIO ===");
+
+        try {
+            String cpf = Utils.lerTexto("CPF do funcionário: ");
+            double salario = Double.parseDouble(Utils.lerTexto("Novo salário: "));
+            int cargaHoraria = Utils.lerInteiro("Nova carga horária semanal: ");
+            String turno = Utils.lerTexto("Novo turno: ");
+            boolean atendente = Utils.lerBooleano("É atendente? (true/false): ");
+
+            boolean atualizado = Funcionario.atualizarFuncionario(
+                cpf, salario, cargaHoraria, turno, atendente
+            );
+
+            if (atualizado) {
+                System.out.println("Funcionário atualizado com sucesso.");
+            } else {
+                System.out.println("Funcionário não encontrado.");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao atualizar funcionário: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
     private static void removerFuncionario() {
         Utils.limparTela();
         System.out.println("=== REMOVER FUNCIONÁRIO ===");
+
+        try {
+            String cpf = Utils.lerTexto("CPF do funcionário: ");
+            boolean removido = Funcionario.deletarFuncionario(cpf);
+
+            if (removido) {
+                System.out.println("Funcionário removido com sucesso.");
+            } else {
+                System.out.println("Funcionário não encontrado.");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao remover funcionário: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 

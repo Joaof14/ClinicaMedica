@@ -36,6 +36,36 @@ public class GerenciarMedicosUI {
     private static void cadastrarMedico() {
         Utils.limparTela();
         System.out.println("=== CADASTRAR MÉDICO ===");
+
+        try {
+            String nome = Utils.lerTexto("Nome: ");
+            int idade = Utils.lerInteiro("Idade: ");
+            String sexo = Utils.lerTexto("Sexo: ");
+            String cpf = Utils.lerTexto("CPF: ");
+            String telefone = Utils.lerTexto("Telefone: ");
+            String login = Utils.lerTexto("Login: ");
+            String senha = Utils.lerTexto("Senha: ");
+            double salario = Double.parseDouble(Utils.lerTexto("Salário: "));
+            int cargaHoraria = Utils.lerInteiro("Carga horária semanal: ");
+            String turno = Utils.lerTexto("Turno: ");
+            boolean atendente = Utils.lerBooleano("É atendente? (true/false): ");
+            String area = Utils.lerTexto("Área de atuação: ");
+            String crm = Utils.lerTexto("CRM: ");
+
+            Medico medico = Medico.cadastrarMedico(
+                nome, idade, sexo, cpf, telefone, login, senha,
+                true, salario, cargaHoraria, turno, atendente, area, crm
+            );
+
+            if (medico != null) {
+                System.out.println("Médico cadastrado com sucesso.");
+            } else {
+                System.out.println("Não foi possível cadastrar o médico.");
+            }
+        } catch (Exception e) {
+            System.out.println("Erro ao cadastrar médico: " + e.getMessage());
+        }
+
         Utils.pausar();
     }
 
