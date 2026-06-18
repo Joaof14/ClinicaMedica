@@ -14,8 +14,7 @@ public class Medico extends Funcionario {
     private String crm;
 
     private static final Set<String> AREAS_DE_ATUACAO_VALIDAS = Set.of(
-            "uti", "ambulatorio", "pronto-socorro", "urgencia", "medicina-preventiva",
-            "neurologia", "pneumologia", "ortopedia", "cardiologia", "clínica geral");
+            "uti", "ambulatorio", "pronto-socorro", "urgencia", "medicina-preventiva");
 
     public Medico(String nome, int idade, String sexo, String cpf, String telefone, String login, String senha,
             boolean ativo, double salario, int cargaHorariaSemanal, String turno, boolean atendente,

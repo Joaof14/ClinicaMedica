@@ -65,11 +65,21 @@ public class MenuPrincipal {
     }
 
     private static Usuario buscarUsuarioPorLogin(String login) {
-        List<Usuario> usuarios = Usuario.listarUsuarios();
+        for (Medico medico : Medico.listarMedicos()) {
+            if (medico.getLogin().equals(login)) {
+                return medico;
+            }
+        }
 
-        for (Usuario usuario : usuarios) {
-            if (usuario.getLogin().equals(login)) {
-                return usuario;
+        for (Paciente paciente : Paciente.listarPacientes()) {
+            if (paciente.getLogin().equals(login)) {
+                return paciente;
+            }
+        }
+
+        for (Funcionario funcionario : Funcionario.listarFuncionario()) {
+            if (funcionario.getLogin().equals(login)) {
+                return funcionario;
             }
         }
 

@@ -1,7 +1,6 @@
 package br.com.clinicamedica.ui;
 
 import java.util.List;
-
 import br.com.clinicamedica.Consulta;
 import br.com.clinicamedica.Medico;
 
@@ -16,9 +15,8 @@ public class MenuMedico {
             System.out.println("|----------------- MENU MÉDICO --------------------|");
             System.out.println("|  1 · Ver consultas                               |");
             System.out.println("|  2 · Iniciar consulta                            |");
-            System.out.println("|  3 · Concluir consulta                           |");
-            System.out.println("|  4 · Registrar prescrição                        |");
-            System.out.println("|  5 · Atualizar status da consulta                |");
+            System.out.println("|  3 · Concluir consulta / Registrar prescrição    |");
+            System.out.println("|  4 · Cancelar consulta                           |");
             System.out.println("|  0 · Voltar                                      |");
             System.out.println("|--------------------------------------------------|");
 
@@ -28,8 +26,7 @@ public class MenuMedico {
                 case 1 -> verConsultas(medicoLogado);
                 case 2 -> iniciarConsulta(medicoLogado);
                 case 3 -> concluirConsulta(medicoLogado);
-                case 4 -> registrarPrescricao(medicoLogado);
-                case 5 -> atualizarStatusConsulta(medicoLogado);
+                case 4 -> cancelarConsulta(medicoLogado);
                 case 0 -> { }
                 default -> Utils.msgOpcaoInvalida();
             }
@@ -95,59 +92,19 @@ public class MenuMedico {
         Utils.pausar();
     }
 
-    private static void registrarPrescricao(Medico medicoLogado) {
+    private static void cancelarConsulta(Medico medicoLogado) {
         Utils.limparTela();
-        System.out.println("=== REGISTRAR PRESCRIÇÃO ===");
-        System.out.println("A prescrição será registrada ao concluir a consulta.");
+        System.out.println("=== CANCELAR CONSULTA ===");
 
         try {
             Consulta consulta = buscarConsultaDoMedicoPorId(medicoLogado);
 
             if (consulta != null) {
-                String prescricao = Utils.lerTexto("Informe a prescrição: ");
-                consulta.concluirConsulta(prescricao);
-                System.out.println("Prescrição registrada com sucesso.");
+                consulta.cancelarConsulta();
+                System.out.println("Consulta cancelada com sucesso.");
             }
         } catch (Exception e) {
-            System.out.println("Erro ao registrar prescrição: " + e.getMessage());
-        }
-
-        Utils.pausar();
-    }
-
-    private static void atualizarStatusConsulta(Medico medicoLogado) {
-        Utils.limparTela();
-        System.out.println("=== ATUALIZAR STATUS DA CONSULTA ===");
-
-        try {
-            Consulta consulta = buscarConsultaDoMedicoPorId(medicoLogado);
-
-            if (consulta != null) {
-                System.out.println("1 - Iniciar consulta");
-                System.out.println("2 - Concluir consulta");
-                System.out.println("3 - Cancelar consulta");
-
-                int opcao = Utils.lerInteiro("Escolha o novo status: ");
-
-                switch (opcao) {
-                    case 1 -> {
-                        consulta.iniciarConsulta();
-                        System.out.println("Status atualizado para EM ANDAMENTO.");
-                    }
-                    case 2 -> {
-                        String prescricao = Utils.lerTexto("Informe a prescrição: ");
-                        consulta.concluirConsulta(prescricao);
-                        System.out.println("Status atualizado para CONCLUÍDA.");
-                    }
-                    case 3 -> {
-                        consulta.cancelarConsulta();
-                        System.out.println("Status atualizado para CANCELADA.");
-                    }
-                    default -> System.out.println("Opção inválida.");
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Erro ao atualizar status da consulta: " + e.getMessage());
+            System.out.println("Erro ao cancelar consulta: " + e.getMessage());
         }
 
         Utils.pausar();

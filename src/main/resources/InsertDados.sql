@@ -26,24 +26,24 @@ INSERT INTO pacientes (id_tb_usuario, peso, altura, sintomas) VALUES
 
 -- 3. INSERINDO FUNCIONÁRIOS
 INSERT INTO funcionarios (id_tb_usuario, salario, carga_horaria_semanal, turno, atendente) VALUES
-(6, 2500.00, 40, 'Manhã', true),
-(7, 2500.00, 40, 'Tarde', true),
-(8, 3000.00, 44, 'Integral', true),
-(9, 2100.00, 30, 'Noite', true),
-(10, 2500.00, 40, 'Manhã', true),
-(11, 15000.00, 20, 'Manhã', false),
-(12, 18000.00, 30, 'Tarde', false),
-(13, 15000.00, 20, 'Noite', false),
-(14, 22000.00, 40, 'Integral', false),
-(15, 12000.00, 20, 'Tarde', false);
+(6, 2500.00, 40, 'matutino', true),
+(7, 2500.00, 40, 'vespertino', true),
+(8, 3000.00, 44, 'matutino', true),
+(9, 2100.00, 30, 'vespertino', true),
+(10, 2500.00, 40, 'matutino', true),
+(11, 15000.00, 20, 'matutino', false),
+(12, 18000.00, 30, 'vespertino', false),
+(13, 15000.00, 20, 'vespertino', false),
+(14, 22000.00, 40, 'matutino', false),
+(15, 12000.00, 20, 'vespertino', false);
 
 -- 4. INSERINDO MÉDICOS
 INSERT INTO medicos (id_tb_funcionario, area_de_atuacao, crm) VALUES
-(6, 'Neurologia', 'CRM-RN-1111'),
-(7, 'Pneumologia', 'CRM-RN-2222'),
-(8, 'Ortopedia', 'CRM-RN-3333'),
-(9, 'Cardiologia', 'CRM-RN-4444'),
-(10, 'Clínica Geral', 'CRM-RN-5555');
+(6, 'UTI', 'CRM-RN-1111'),
+(7, 'ambulatorio', 'CRM-RN-2222'),
+(8, 'urgencia', 'CRM-RN-3333'),
+(9, 'pronto-socorro', 'CRM-RN-4444'),
+(10, 'medicina-preventiva', 'CRM-RN-5555');
 
 select * from pacientes;
 
